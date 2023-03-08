@@ -40,6 +40,7 @@ def step_1(PrP, args, tim):
     This function estimate Eccenctric Anomaly to calculate True Anomaly.
 
     From relationship between Mean Anomaly and Eccentric Anomaly,
+
     M = E - e sin( E ),
     
     find E that make that equation holds with Newton-Raphson Method.
@@ -58,6 +59,7 @@ def step_2(args):
     This function calculate True Anomaly by Eccentric Anomaly.
 
     From relationship between Eccentric Anomaly and True Anomaly,
+
     tan( nu / 2 ) = sqrt( ( 1 + e ) / ( 1 - e ) ) tan( E / 2 ).
     '''
 
