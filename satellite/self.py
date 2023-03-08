@@ -12,3 +12,6 @@ class Satellite:
         self.AscendingNode      = -1
         self.OrbitalInclination = -1
         self.ArgumentOfPerigee  = -1
+
+        self.position = -1
+        self.velocity = -1
