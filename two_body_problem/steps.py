@@ -6,6 +6,13 @@ from numpy import cos, sin, tan, arctan
 
 ## function that find root => estimate Eccentric Anomaly
 def func( EccAnm, args ):
+    '''
+    This function represent the relationship between
+    Mean Anomaly and Eccentric Anomaly.
+
+    M = E - e sin( E )
+    =>  func( E ) = E - e sin( E ) - M
+    '''
 
     Ecc    = args["Ecc"]
     MeaAnm = args["MeaAnm"]
@@ -14,6 +21,13 @@ def func( EccAnm, args ):
 
 
 def grad( EccAnm, args ):
+    '''
+    This function represent the derivative of the relationship between
+    Mean Anomaly and Eccentric Anomaly.
+
+    M = E - e sin( E )
+    => grad( E ) = 1 - e cos( E )
+    '''
 
     Ecc = args["Ecc"]
 
@@ -22,6 +36,14 @@ def grad( EccAnm, args ):
 
 ## steps to calculate position and velocity
 def step_1(PrP, args, tim):
+    '''
+    This function estimate Eccenctric Anomaly to calculate True Anomaly.
+
+    From relationship between Mean Anomaly and Eccentric Anomaly,
+    M = E - e sin( E ),
+    
+    find E that make that equation holds with Newton-Raphson Method.
+    '''
     
     ## Eccentric Anomaly
     EccAnm = 0
@@ -32,6 +54,12 @@ def step_1(PrP, args, tim):
 
 
 def step_2(args):
+    '''
+    This function calculate True Anomaly by Eccentric Anomaly.
+
+    From relationship between Eccentric Anomaly and True Anomaly,
+    tan( nu / 2 ) = sqrt( ( 1 + e ) / ( 1 - e ) ) tan( E / 2 ).
+    '''
 
     EccAnm = args["EccAnm"]
     EccCef = args["EccCef"]
@@ -42,6 +70,10 @@ def step_2(args):
 
 
 def step_3(args, position, velocity):
+    '''
+    This function calculate position and velocity by the relationship 
+    with True Anomaly.
+    '''
 
     Ecc    = args["Ecc"]
     TruAnm = args["TruAnm"]
