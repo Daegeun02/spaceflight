@@ -10,7 +10,7 @@ class NewtonRaphson:
         self.itr = itr
 
 
-    def solve(self, func, grad, x0):
+    def solve(self, func, grad, x0, args):
         '''
         root = newtonRaphson(func, grad, x0)
 
@@ -30,9 +30,9 @@ class NewtonRaphson:
 
         xK = x0
 
-        for _ in range(itr):
-            f = func(xK)
-            g = grad(xK)
+        for _ in range( itr ):
+            f = func( xK, args ) 
+            g = grad( xK, args )
 
             if ( dx < tol ):
                 return xK
