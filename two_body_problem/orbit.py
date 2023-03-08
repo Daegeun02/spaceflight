@@ -9,6 +9,14 @@ from time import sleep
 
 
 class TwoBodyOrbit(Thread):
+    '''
+    Estimate satellite's position and velocity in pqw coordinate.
+
+    This function has three step's to calculate position and velocity.
+    step 1. estimate eccentric anomaly
+    step 2. calculate true anomaly
+    step 3. calculate position and velocity
+    '''
 
 
     def __init__(self, satellite, geometric, globaltim):
@@ -25,14 +33,6 @@ class TwoBodyOrbit(Thread):
 
 
     def run(self):
-        '''
-        Estimate satellite's position and velocity in pqw coordinate.
-
-        This function has three step's to calculate position and velocity.
-        step 1. estimate eccentric anomaly
-        step 2. calculate true anomaly
-        step 3. calculate position and velocity
-        '''
 
         print('initialize...')
         ## satellite object
