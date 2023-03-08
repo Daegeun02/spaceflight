@@ -1,0 +1,6 @@
+{
+    "NewtonRaphson": {
+        "tol": 1.0e-8,
+        "itr": 1000
+    }
+}

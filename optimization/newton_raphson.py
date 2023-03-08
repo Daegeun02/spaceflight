@@ -1,0 +1,52 @@
+
+
+
+class NewtonRaphson:
+
+
+    def __init__(self, tol, itr):
+
+        self.tol = tol
+        self.itr = itr
+
+
+    def solve(self, func, grad, x0):
+        '''
+        root = newtonRaphson(func, grad, x0)
+
+        Finds a root of f(x) = 0 by combining the Newton - Raphson method.
+        func: f(x)
+        grad: gradient of f(x)
+        x0  : initial condition
+
+        *** x is scalar ***
+        '''
+
+        tol = self.tol
+        itr = self.itr
+
+        if ( func( x0 ) == 0.0 ):
+            return x0
+
+        xK = x0
+
+        for _ in range(itr):
+            f = func(xK)
+            g = grad(xK)
+
+            if ( dx < tol ):
+                return xK
+
+            if ( g == 0.0 ):
+                print('zero division error')
+                break
+
+            dx = f / g
+
+            xK -= dx
+
+        print('NewtonRaphson fail to find root of given function')
+
+
+    def tune_hyper_parameter(self):
+        pass
