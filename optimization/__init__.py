@@ -1,5 +1,5 @@
 ## optimization algorithm's are implemented in this package
-from newton_raphson import NewtonRaphson
+from .newton_raphson import NewtonRaphson
 
 
 

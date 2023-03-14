@@ -92,5 +92,3 @@ def step_3(args, position, velocity):
 
     velocity[0] = SemCef * sTruAnm * ( -1 )
     velocity[1] = SemCef * ( Ecc + cTruAnm )
-
-        

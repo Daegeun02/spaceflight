@@ -70,19 +70,21 @@ class TwoBodyOrbit(Thread):
 
         print('initialize finished...')
 
-        estimating = self.estimating
-
         print('start estimate orbit')
 
-        while estimating:
+        while self.estimating:
 
-            step_1( PrP, args, tim )
+            # step_1( PrP, args, tim )
 
-            step_2( args )
+            # step_2( args )
+
+            args["TruAnm"] = 90.0 * 3.14 / 180
 
             step_3( args, position, velocity )
 
             sleep( dt )
+
+        print('end')
 
 
     def join(self):

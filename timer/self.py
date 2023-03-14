@@ -27,9 +27,7 @@ class GlobalTim(Thread):
         
         dt  = self.dt
 
-        ticking = self.ticking
-
-        while ticking:
+        while self.ticking:
 
             self.tim += dt
 
