@@ -1,3 +1,3 @@
 ## timer that synchronize satellite and ground
 
-from .self import GlobalTim
+from .timer import GlobalTim

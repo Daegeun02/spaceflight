@@ -10,7 +10,7 @@ from time import time
 
 if __name__ == "__main__":
 
-    timer = GlobalTim(Hz=10)
+    timer = GlobalTim(Hz=20)
 
     earth = EARTH()
 

@@ -1,3 +1,3 @@
 ## GCS.. Ground Control Station
 
-from .self import GroundControlStation
+from .ground_station import GroundControlStation

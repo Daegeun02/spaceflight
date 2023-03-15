@@ -18,7 +18,7 @@ class GlobalTim(Thread):
         self.daemon = True
 
         self.tim = 0
-        self.dt  = 1 / Hz
+        self.dt  = ( 1 / Hz ) 
 
         self.ticking = True
 

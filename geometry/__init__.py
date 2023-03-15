@@ -1,3 +1,3 @@
 ## geometric model
 
-from .self import EARTH
+from .earth import EARTH

@@ -60,10 +60,10 @@ class GroundControlStation(Thread):
             location[:] = attitude @ position
             movement[:] = attitude @ velocity
 
-            print(location)
-            print(movement)
-
             sleep( dt )
+
+        print(location)
+        print(movement)
 
 
     def PQW2ECI(self, AcN, OIc, AOP):

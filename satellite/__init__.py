@@ -1,3 +1,3 @@
 ## satellite
 
-from .self import Satellite
+from .satellite import Satellite
