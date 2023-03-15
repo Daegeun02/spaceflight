@@ -1,6 +1,6 @@
 from threading import Thread
 
-from time import sleep
+from time import sleep, time
 
 
 
@@ -27,8 +27,10 @@ class GlobalTim(Thread):
         
         dt  = self.dt
 
+        t_start = time()
+
         while self.ticking:
 
-            self.tim += dt
+            self.tim  = time() - t_start
 
             sleep( dt )
