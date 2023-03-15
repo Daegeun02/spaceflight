@@ -10,9 +10,14 @@ from time import time
 
 if __name__ == "__main__":
 
-    timer = GlobalTim(Hz=20)
+    timer = GlobalTim(
+        Hz=200
+    )
 
-    earth = EARTH()
+    earth = EARTH(
+        theta_0  =0,
+        globaltim=timer
+    )
 
     Sate1 = Satellite()
 
@@ -36,7 +41,7 @@ if __name__ == "__main__":
 
     t1 = time()
 
-    while timer.tim < 3:
+    while timer.tim < 1.5:
 
         pass
 

@@ -29,7 +29,7 @@ class EARTH(Thread):
         self.ECI2ECEF  = eye( 3 )
         self.dECI2ECEF = zeros((3,3))
         self.theta_T   = theta_0
-        self.d_theta   = self.Rotvelo * globaltim.dt
+        self.d_theta   = self.RotVelo * globaltim.dt
 
         self.rotating = True
 

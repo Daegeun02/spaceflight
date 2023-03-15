@@ -3,7 +3,7 @@ from threading import Thread
 from numpy import zeros
 from numpy import cos, sin
 
-from time import sleep
+from time import sleep, time
 
 
 
@@ -61,7 +61,7 @@ class GroundControlStation(Thread):
             movement[:] = attitude @ velocity
 
             sleep( dt )
-
+        
         print(location)
         print(movement)
 
