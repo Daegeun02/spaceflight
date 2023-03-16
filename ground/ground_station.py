@@ -1,9 +1,11 @@
 from threading import Thread
 
-from numpy import zeros
+from numpy import zeros, array
 from numpy import cos, sin
 
-from time import sleep, time
+from time import sleep
+
+from .visualizer import plot_trajectory
 
 
 
@@ -16,14 +18,14 @@ class GroundControlStation(Thread):
     '''
 
 
-    def __init__(self, satellite, globaltim):
+    def __init__(self, satellite, globaltim, n=20000):
 
         super().__init__()
 
         self.daemon = True
 
-        self.location = zeros(3)
-        self.movement = zeros(3)
+        self.location = zeros((3,n))
+        self.movement = zeros((3,n))
 
         self.attitude = zeros((3,3))
 
@@ -31,6 +33,8 @@ class GroundControlStation(Thread):
         self.globaltim = globaltim
 
         self.tracking = True
+
+        self.trackIdx = 0
 
 
     def run(self):
@@ -57,13 +61,19 @@ class GroundControlStation(Thread):
 
         while self.tracking:
 
-            location[:] = attitude @ position
-            movement[:] = attitude @ velocity
+            location[:,self.trackIdx] = attitude @ position
+            movement[:,self.trackIdx] = attitude @ velocity
+
+            self.trackIdx += 1
 
             sleep( dt )
-        
-        print(position)
-        print(velocity)
+
+
+    def join(self):
+
+        super().join()
+
+        # plot_trajectory( self.location, self.trackIdx )
 
 
     def PQW2ECI(self, AcN, OIc, AOP):

@@ -82,8 +82,6 @@ class TwoBodyOrbit(Thread):
 
             sleep( dt )
 
-        print(args["TruAnm"])
-
         print('end')
 
 
