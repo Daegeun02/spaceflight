@@ -1,6 +1,6 @@
 from threading import Thread
 
-from numpy import zeros, array
+from numpy import zeros
 from numpy import cos, sin
 
 from time import sleep
@@ -59,21 +59,28 @@ class GroundControlStation(Thread):
         tim = globaltim.tim
         dt  = globaltim.dt
 
+        trackIdx = 0
+
         while self.tracking:
 
-            location[:,self.trackIdx] = attitude @ position
-            movement[:,self.trackIdx] = attitude @ velocity
+            location[:,trackIdx] = attitude @ position
+            movement[:,trackIdx] = attitude @ velocity
 
-            self.trackIdx += 1
+            trackIdx += 1
 
-            sleep( dt )
+            sleep( dt - 0.01 )
+
+        self.trackIdx = trackIdx
+
+        print(self.trackIdx)
+
 
 
     def join(self):
 
         super().join()
 
-        # plot_trajectory( self.location, self.trackIdx )
+        plot_trajectory( self.location, self.trackIdx )
 
 
     def PQW2ECI(self, AcN, OIc, AOP):

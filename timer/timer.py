@@ -19,10 +19,7 @@ class GlobalTim(Thread):
 
         self.tim = 0
 
-        if debug:
-            self.dt = ( 0.001 / Hz ) 
-        else:
-            self.dt = ( 1 / Hz )
+        self.dt = ( 1 / Hz )
 
         self.debug = debug
 
@@ -35,18 +32,8 @@ class GlobalTim(Thread):
 
         t_start = time()
 
-        if self.debug:
+        while self.ticking:
 
-            while self.ticking:
+            self.tim = time() - t_start
 
-                self.tim += dt * 1000
-
-                sleep( dt )
-        
-        else:
-
-            while self.ticking:
-
-                self.tim = time() - t_start
-
-                sleep( dt )
+            sleep( dt )

@@ -5,18 +5,14 @@ from geometry         import EARTH
 from ground           import GroundControlStation
 from transfer         import LambertProblem
 
-from ground           import plot_2_trajectory
-
 from time import time
-
-from numpy import deg2rad
 
 
 
 if __name__ == "__main__":
 
     timer = GlobalTim(
-        Hz=1, debug=True
+        Hz=30
     )
 
     earth = EARTH(
@@ -36,11 +32,6 @@ if __name__ == "__main__":
         satellite=Sate1,
         globaltim=timer
     )
-
-    GCS2 = GroundControlStation(
-        satellite=Sate1,
-        globaltim=timer
-    )
     
     timer.start()
 
@@ -48,36 +39,18 @@ if __name__ == "__main__":
 
     GCS1.start()
 
-    Sate1.OrbitalInclination = deg2rad(0.0)
-    GCS2.start()
-
     t1 = time()
-
-    while timer.tim < 5800:
+    while timer.tim < 40:
 
         pass
-
     t2 = time()
 
     print( t2 - t1 )
 
     orbit.estimating = False
-
-    GCS1.tracking = False
-    GCS2.tracking = False
-
-    timer.ticking = False
+    GCS1.tracking    = False
+    timer.ticking    = False
 
     orbit.join()
-
     GCS1.join()
-    GCS2.join()
-
     timer.join()
-
-    plot_2_trajectory(
-        GCS1.location,
-        GCS2.location,
-        GCS1.trackIdx,
-        GCS2.trackIdx
-    )
