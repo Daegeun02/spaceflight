@@ -12,12 +12,15 @@ class NewtonRaphson:
 
     def solve(self, func, grad, x0, args):
         '''
-        root = newtonRaphson(func, grad, x0)
+        root = newtonRaphson(
+            func, grad, x0, args
+        )
 
         Finds a root of f(x) = 0 by combining the Newton - Raphson method.
         func: f(x)
         grad: gradient of f(x)
         x0  : initial condition
+        args: arguments of func, grad
 
         *** x is scalar ***
         '''
@@ -25,10 +28,11 @@ class NewtonRaphson:
         tol = self.tol
         itr = self.itr
 
-        if ( func( x0 ) == 0.0 ):
+        if ( func( x0, args ) == 0.0 ):
             return x0
 
         xK = x0
+        dx = 1e8
 
         for _ in range( itr ):
             f = func( xK, args ) 
