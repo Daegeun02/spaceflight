@@ -4,7 +4,7 @@ from .steps import step_1, step_2, step_3
 
 from math import sqrt
 
-from time import sleep , time
+from time import sleep
 
 
 
@@ -72,27 +72,17 @@ class TwoBodyOrbit(Thread):
 
         print('start estimate orbit')
 
-        t = 0
-
-        t1 = time()
-
         while self.estimating:
 
-            # step_1( PrP, args, tim )
+            step_1( PrP, args, globaltim.tim )
 
-            # step_2( args )
-
-            args["TruAnm"] = 90.0 * 3.14 / 180
+            step_2( args )
 
             step_3( args, position, velocity )
 
             sleep( dt )
 
-            t += 1
-
-        t2 = time()
-
-        print('asdf', t, t2 - t1)
+        print(args["TruAnm"])
 
         print('end')
 

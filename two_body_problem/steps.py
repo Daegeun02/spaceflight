@@ -66,7 +66,7 @@ def step_2(args):
     EccAnm = args["EccAnm"]
     EccCef = args["EccCef"]
 
-    args["TruAnm"] = arctan( 
+    args["TruAnm"] = 2 * arctan( 
         EccCef * tan( EccAnm / 2 )
     )
 

@@ -3,6 +3,7 @@ from timer            import GlobalTim
 from satellite        import Satellite
 from geometry         import EARTH
 from ground           import GroundControlStation
+from transfer         import LambertProblem
 
 from time import time
 
@@ -11,7 +12,7 @@ from time import time
 if __name__ == "__main__":
 
     timer = GlobalTim(
-        Hz=200
+        Hz=20, debug=True
     )
 
     earth = EARTH(
@@ -41,7 +42,7 @@ if __name__ == "__main__":
 
     t1 = time()
 
-    while timer.tim < 1.5:
+    while timer.tim < 1:
 
         pass
 

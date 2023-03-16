@@ -1,9 +1,10 @@
 ## LAMBERT PROBLEM
 from geometry     import GRAVCONST, EARTHMASS
 
-from optimization import LevenbergMarquardt
+from optimization import levenbergMarquardt
 
-from numpy import sqrt, cos
+from numpy import sqrt, cos, sin
+from numpy import zeros
 
 
 
@@ -19,8 +20,6 @@ class LambertProblem:
     From two major factor of transfer orbit,
     calculate six elements of orbit.
     '''
-
-    LM_method = LevenbergMarquardt()
 
     def __init__(self):
 
@@ -52,18 +51,50 @@ class LambertProblem:
         q = ( sqrt( r1 * r2 ) / s ) * cos( theta / 2 )
         T = ( 1 / s ) * sqrt( 8 * mu / s ) * ( t2 - t1 )
 
-        '''
-        Do Levenberg-Marquardt Algorithm
-        '''
+        args = {
+            "T": T,
+            "q": q,
+            "f": zeros(2),
+            "J": zeros((2,2))
+        }
+
+        x0 = zeros( 2 )
+
+        ## solve with alpha, beta by levenberg-marquardt algorithm
+        xS = levenbergMarquardt( func, jacb, x0, args )
 
         '''
         Calculate six elements of orbit
         '''
 
 
-def f1():
-    pass
+def func( x, args ):
+
+    a, b = x
+
+    T = args["T"]
+    q = args["q"]
+    f = args["f"]
+
+    f[0] = sin( b / 2 ) - q * sin( a / 2 )
+    f[1] = T * ( sin( a / 2 ) ** 3 ) - ( a - b - sin( a ) + sin( b ) )
 
 
-def f2():
-    pass
+def jacb( x, args ):
+    
+    a, b = x
+
+    T = args["T"]
+    q = args["q"]
+    J = args["J"]
+
+    ca2 = cos( a / 2 )
+    sa2 = sin( a / 2 )
+
+    J[0,0] = q * ca2 * (-0.5)
+
+    J[1,0] = T * ( sa2 ** 2 ) * ca2 * (1.5) - 1 + cos( a )
+
+    J[0,1] = ca2 * (0.5)
+
+    J[1,1] = 1 - cos( b )

@@ -62,8 +62,8 @@ class GroundControlStation(Thread):
 
             sleep( dt )
         
-        print(location)
-        print(movement)
+        print(position)
+        print(velocity)
 
 
     def PQW2ECI(self, AcN, OIc, AOP):

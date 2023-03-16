@@ -11,26 +11,39 @@ class GlobalTim(Thread):
     '''
 
 
-    def __init__(self, Hz=20):
+    def __init__(self, Hz=20, debug=False):
 
         super().__init__()
 
         self.daemon = True
 
         self.tim = 0
-        self.dt  = ( 1 / Hz ) 
+
+        self.dt = ( 1 / Hz ) 
+
+        self.debug = debug
 
         self.ticking = True
 
 
     def run(self):
         
-        dt  = self.dt
+        dt = self.dt
 
         t_start = time()
 
-        while self.ticking:
+        if self.debug:
 
-            self.tim  = time() - t_start
+            while self.ticking:
 
-            sleep( dt )
+                self.tim += dt
+
+                sleep( dt / 1000 )
+        
+        else:
+
+            while self.ticking:
+
+                self.tim = time() - t_start
+
+                sleep( dt )
