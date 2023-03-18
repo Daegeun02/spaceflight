@@ -6,30 +6,29 @@ from numpy import sin, cos
 
 def deriv_r( args ):
 
-    P = args["p"]
-    M = args["mu"]
+    p = args["p"]
+    m = args["mu"]
     N = args["nu"]
-    E  = args["ECC"]
+    e = args["e"]
 
     def dr_dt( t, r ):
 
-        return sqrt( M / P ) * E * sin( N )
+        return sqrt( m / p ) * e * sin( N )
 
     return dr_dt
 
 
 def deriv_nu( args ):
 
-    P = args["p"]
-    M = args["mu"]
-    N = args["nu"]
-    E = args["ECC"]
+    p = args["p"]
+    m = args["mu"]
+    e = args["e"]
 
-    P3 = P ** 3
+    p3 = p ** 3
 
-    def dnu_dt( t, nu ):
+    def dnu_dt( t, N ):
 
-        return sqrt( M / P3 ) * ( ( 1 + E * cos( nu ) ) ** 2 )
+        return sqrt( m / p3 ) * ( ( 1 + e * cos( N ) ) ** 2 )
 
     return dnu_dt
 
@@ -40,7 +39,7 @@ if __name__ == "__main__":
         "p" : 100,
         "mu": 32,
         "nu": 0.8,
-        "ECC" : 0.1
+        "e" : 0.1
     }
 
     dr_dt = deriv_r( args )
