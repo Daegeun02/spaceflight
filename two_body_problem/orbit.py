@@ -40,12 +40,12 @@ class TwoBodyOrbit(Thread):
         geometric = self.geometric
         globaltim = self.globaltim
         ## Classical Orbital Elements
-        SMA = satellite.SemiMajorAxis
-        Ecc = satellite.Eccentricity
-        PrP = satellite.PerigeePassage
-        AcN = satellite.AscendingNode
-        OIc = satellite.OrbitalInclination
-        AOP = satellite.ArgumentOfPerigee
+        a = satellite.a
+        e = satellite.e
+        T = satellite.T
+        o = satellite.o
+        i = satellite.i
+        w = satellite.w
 
         position = satellite.position
         velocity = satellite.velocity
@@ -55,17 +55,17 @@ class TwoBodyOrbit(Thread):
         tim = globaltim.tim
         dt  = globaltim.dt
 
-        SemRec = SMA * ( 1 - Ecc ** 2 )
+        p = a * ( 1 - ( e ** 2 ) )
 
         args = {
-            "Ecc"   : Ecc,
-            "MeaAnm": -1,
-            "AngFrq": sqrt( mu / ( SMA ** 3 ) ),
-            "EccAnm": -1,
-            "EccCef": sqrt( ( 1 + Ecc ) / ( 1 - Ecc ) ),
-            "TruAnm": -1,
-            "SemRec": SemRec,
-            "SemCef": sqrt( mu / SemRec )
+            "e" : e,
+            "M" : -1,
+            "n" : sqrt( mu / ( a ** 3 ) ),
+            "E" : -1,
+            "eC": sqrt( ( 1 + e ) / ( 1 - e ) ),
+            "N" : -1,
+            "p" : p,
+            "pC": sqrt( mu / p )
         }
 
         print('initialize finished...')
@@ -74,7 +74,7 @@ class TwoBodyOrbit(Thread):
 
         while self.estimating:
 
-            step_1( PrP, args, globaltim.tim )
+            step_1( T, args, globaltim.tim )
 
             step_2( args )
 

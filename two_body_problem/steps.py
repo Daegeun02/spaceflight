@@ -5,7 +5,7 @@ from numpy import cos, sin, tan, arctan
 
 
 ## function that find root => estimate Eccentric Anomaly
-def func( EccAnm, args ):
+def func( E, args ):
     '''
     This function represent the relationship between
     Mean Anomaly and Eccentric Anomaly.
@@ -14,13 +14,13 @@ def func( EccAnm, args ):
     =>  func( E ) = E - e sin( E ) - M
     '''
 
-    Ecc    = args["Ecc"]
-    MeaAnm = args["MeaAnm"]
+    e = args["e"]
+    M = args["M"]
 
-    return ( EccAnm - Ecc * sin(EccAnm) - MeaAnm )
+    return ( E - e * sin(E) - M )
 
 
-def grad( EccAnm, args ):
+def grad( E, args ):
     '''
     This function represent the derivative of the relationship between
     Mean Anomaly and Eccentric Anomaly.
@@ -29,13 +29,13 @@ def grad( EccAnm, args ):
     => grad( E ) = 1 - e cos( E )
     '''
 
-    Ecc = args["Ecc"]
+    e = args["e"]
 
-    return ( 1 - Ecc * cos(EccAnm) )
+    return ( 1 - e * cos(E) )
 
 
 ## steps to calculate position and velocity
-def step_1(PrP, args, tim):
+def step_1(T, args, tim):
     '''
     This function estimate Eccenctric Anomaly to calculate True Anomaly.
 
@@ -47,11 +47,11 @@ def step_1(PrP, args, tim):
     '''
     
     ## Eccentric Anomaly
-    EccAnm = 0
+    E = 0
     ## Mean Anomaly
-    args["MeaAnm"] = args["AngFrq"] * ( tim - PrP )
+    args["M"] = args["n"] * ( tim - T )
 
-    args["EccAnm"] = newtonRaphson( func, grad, EccAnm, args )
+    args["E"] = newtonRaphson( func, grad, E, args )
 
 
 def step_2(args):
@@ -63,11 +63,11 @@ def step_2(args):
     tan( nu / 2 ) = sqrt( ( 1 + e ) / ( 1 - e ) ) tan( E / 2 ).
     '''
 
-    EccAnm = args["EccAnm"]
-    EccCef = args["EccCef"]
+    E  = args["E"]
+    eC = args["eC"]
 
-    args["TruAnm"] = 2 * arctan( 
-        EccCef * tan( EccAnm / 2 )
+    args["N"] = 2 * arctan( 
+        eC * tan( E / 2 )
     )
 
 
@@ -77,18 +77,18 @@ def step_3(args, position, velocity):
     with True Anomaly.
     '''
 
-    Ecc    = args["Ecc"]
-    TruAnm = args["TruAnm"]
-    SemRec = args["SemRec"]
-    SemCef = args["SemCef"]
+    e  = args["e"]
+    N  = args["N"]
+    p  = args["p"]
+    pC = args["pC"]
 
-    cTruAnm = cos( TruAnm )
-    sTruAnm = sin( TruAnm )
+    cN = cos( N )
+    sN = sin( N )
 
-    r = SemRec / ( 1 + Ecc * cTruAnm ) 
+    r = p / ( 1 + e * cN ) 
 
-    position[0] = r * cTruAnm
-    position[1] = r * sTruAnm
+    position[0] = r * cN
+    position[1] = r * sN
 
-    velocity[0] = SemCef * sTruAnm * ( -1 )
-    velocity[1] = SemCef * ( Ecc + cTruAnm )
+    velocity[0] = pC * sN * ( -1 )
+    velocity[1] = pC * ( e + cN )

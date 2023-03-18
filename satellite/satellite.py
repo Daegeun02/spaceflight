@@ -1,4 +1,5 @@
-from numpy import zeros, deg2rad
+from numpy import zeros 
+from numpy import deg2rad
 
 
 
@@ -7,12 +8,15 @@ class Satellite:
 
     def __init__(self):
 
-        self.SemiMajorAxis      = 100
-        self.Eccentricity       = 0
-        self.PerigeePassage     = 0
-        self.AscendingNode      = deg2rad(0.0)
-        self.OrbitalInclination = deg2rad(0.0)
-        self.ArgumentOfPerigee  = deg2rad(0.0)
+        self.a = 100                    ## semimajor axis
+        self.e = 0                      ## eccentricity
+        self.T = 0                      ## perigee passage
+        self.o = deg2rad( 0.0 )         ## ascending node
+        self.i = deg2rad( 0.0 )         ## orbital inclination
+        self.w = deg2rad( 0.0 )         ## argument of perigee
+
+        self.r = self.a * ( 1 - self.e )        ## distance from focus
+        self.N = 0                              ## true anomaly
 
         self.position = zeros(3)
         self.velocity = zeros(3)

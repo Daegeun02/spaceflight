@@ -42,9 +42,9 @@ class GroundControlStation(Thread):
         satellite = self.satellite
         globaltim = self.globaltim
 
-        AcN = satellite.AscendingNode
-        OIc = satellite.OrbitalInclination
-        AOP = satellite.ArgumentOfPerigee
+        o = satellite.o
+        i = satellite.i
+        w = satellite.w
 
         position = satellite.position
         velocity = satellite.velocity
@@ -52,7 +52,7 @@ class GroundControlStation(Thread):
         location = self.location
         movement = self.movement
 
-        self.PQW2ECI( AcN, OIc, AOP )
+        self.PQW2ECI( o, i, w )
 
         attitude = self.attitude
 
@@ -83,20 +83,20 @@ class GroundControlStation(Thread):
         plot_trajectory( self.location, self.trackIdx )
 
 
-    def PQW2ECI(self, AcN, OIc, AOP):
+    def PQW2ECI(self, o, i, w):
         
         attitude = self.attitude
 
-        cA, sA = cos( AcN ), sin( AcN )
-        cO, sO = cos( OIc ), sin( OIc )
-        cP, sP = cos( AOP ), sin( AOP )
+        co, so = cos( o ), sin( o )
+        ci, si = cos( i ), sin( i )
+        cw, sw = cos( w ), sin( w )
 
-        attitude[0,0] = cP * cA - sP * cO * sA
-        attitude[1,0] = cP * sA + sP * cO * cA
-        attitude[2,0] = sP * sO
-        attitude[0,1] = (-1) * (sP * cA + cP * cO * sA)
-        attitude[1,1] = cP * cO * cA - sP * sA
-        attitude[2,1] = cP * sO
-        attitude[0,2] = sO * sA
-        attitude[1,2] = (-1) * sO * cA
-        attitude[2,2] = cO
+        attitude[0,0] = cw * co - sw * ci * so
+        attitude[1,0] = cw * so + sw * ci * co
+        attitude[2,0] = sw * si
+        attitude[0,1] = (-1) * (sw * co + cw * ci * so)
+        attitude[1,1] = cw * ci * co - sw * so
+        attitude[2,1] = cw * si
+        attitude[0,2] = si * so
+        attitude[1,2] = (-1) * si * co
+        attitude[2,2] = ci
