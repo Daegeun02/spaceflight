@@ -8,10 +8,11 @@ def deriv_r( args ):
 
     p = args["p"]
     m = args["mu"]
-    N = args["N"]
     e = args["e"]
 
-    def dr_dt( t, r ):
+    def dr_dt( t, r, args ):
+
+        N = args["N"]
 
         return sqrt( m / p ) * e * sin( N )
 
@@ -26,7 +27,7 @@ def deriv_N( args ):
 
     p3 = p ** 3
 
-    def dN_dt( t, N ):
+    def dN_dt( t, N, args ):
 
         return sqrt( m / p3 ) * ( ( 1 + e * cos( N ) ) ** 2 )
 
@@ -38,7 +39,7 @@ if __name__ == "__main__":
     args = {
         "p" : 100,
         "mu": 32,
-        "N": 0.8,
+        "N" : 0.8,
         "e" : 0.1
     }
 
