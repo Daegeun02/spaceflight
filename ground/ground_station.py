@@ -72,9 +72,6 @@ class GroundControlStation(Thread):
 
         self.trackIdx = trackIdx
 
-        print(self.trackIdx)
-
-
 
     def join(self):
 
