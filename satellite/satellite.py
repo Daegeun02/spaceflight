@@ -18,5 +18,10 @@ class Satellite:
         self.r = self.a * ( 1 - self.e )        ## distance from focus
         self.N = 0                              ## true anomaly
 
+        self.R_at_pqw = {
+            "r": self.a * ( 1- self.e ),
+            "N": 0
+        }
+
         self.position = zeros(3)
         self.velocity = zeros(3)
