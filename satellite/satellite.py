@@ -7,8 +7,8 @@ class Satellite:
 
     def __init__(self):
 
-        self.SemiMajorAxis      = 660
-        self.Eccentricity       = 0.7
+        self.SemiMajorAxis      = 100
+        self.Eccentricity       = 0
         self.PerigeePassage     = 0
         self.AscendingNode      = deg2rad(0.0)
         self.OrbitalInclination = deg2rad(0.0)

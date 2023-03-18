@@ -40,7 +40,7 @@ if __name__ == "__main__":
     GCS1.start()
 
     t1 = time()
-    while timer.tim < 40:
+    while timer.tim < 30:
 
         pass
     t2 = time()

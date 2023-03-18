@@ -31,8 +31,6 @@ class TwoBodyOrbit(Thread):
 
         self.estimating = True
 
-        self.estimtgidx = 0
-
 
     def run(self):
 
@@ -74,8 +72,6 @@ class TwoBodyOrbit(Thread):
 
         print('start estimate orbit')
 
-        estimtgidx = 0
-
         while self.estimating:
 
             step_1( PrP, args, globaltim.tim )
@@ -86,13 +82,7 @@ class TwoBodyOrbit(Thread):
 
             sleep( dt - 0.01 )
 
-            estimtgidx += 1
-        
-        self.estimtgidx = estimtgidx
-
         print('end')
-
-        print(self.estimtgidx)
 
 
     def join(self):

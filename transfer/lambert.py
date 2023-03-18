@@ -1,6 +1,4 @@
 ## LAMBERT PROBLEM
-from geometry     import GRAVCONST, EARTHMASS
-
 from optimization import levenbergMarquardt
 
 from numpy import sqrt, cos, sin
@@ -21,12 +19,9 @@ class LambertProblem:
     calculate six elements of orbit.
     '''
 
-    def __init__(self):
+    def __init__(self, geometry):
 
-        self.G = GRAVCONST
-        self.M = EARTHMASS
-
-        self.mu = GRAVCONST * EARTHMASS / ( 1000 ** 3 )
+        self.mu = geometry.mu
 
 
     def solve(self, r1, r2, t1, t2, theta):
