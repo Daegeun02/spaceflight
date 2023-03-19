@@ -9,15 +9,13 @@ from numpy import array
 
 if __name__ == "__main__":
 
-    trajectory, sub_trajectory = do_simulate(dt=10)
+    trajectory = do_simulate(dt=0.1)
 
     trajectory = array( trajectory )
-    sub_trajectory = array( sub_trajectory )
 
     print(trajectory.shape)
 
-    plt.scatter( trajectory[:,0], trajectory[:,1], s=10 )
-    plt.scatter( sub_trajectory[:,0], sub_trajectory[:,1], s=10 )
+    plt.scatter( trajectory[:,0], trajectory[:,1], s=1 )
     
     plt.axis('equal')
 

@@ -24,32 +24,17 @@ def do_simulate( dt=10 ):
     simul = Simulator(
         satellite=Sate1,
         geometric=earth,
-        dt=10
-    )
-
-    sub_simul = Simulator(
-        satellite=Sate1,
-        geometric=earth,
         dt=dt
     )
 
     simul.start()
 
-    sub_simul.start()
-
-    t = 0
-
-    while t < 0.2:
-
-        sleep(0.1)
-
-        t += 0.1
+    while simul.t < ( Sate1.period ):
+        pass
 
     simul.stop()
 
-    sub_simul.stop()
-
-    return simul.position, sub_simul.position
+    return simul.position
 
 
 def do_realtime():

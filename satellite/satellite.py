@@ -25,3 +25,5 @@ class Satellite:
 
         self.position = zeros(3)
         self.velocity = zeros(3)
+
+        self.period = 1e8

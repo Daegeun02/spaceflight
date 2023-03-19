@@ -1,3 +1,4 @@
+from numpy import abs
 
 
 
@@ -38,7 +39,7 @@ class NewtonRaphson:
             f = func( xK, args ) 
             g = grad( xK, args )
 
-            if ( dx < tol ):
+            if ( abs( f ) < tol ):
                 return xK
 
             if ( g == 0.0 ):

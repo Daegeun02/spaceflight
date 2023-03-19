@@ -35,7 +35,7 @@ def grad( E, args ):
 
 
 ## steps to calculate position and velocity
-def step_1(T, args, tim):
+def step_1( args, tim ):
     '''
     This function estimate Eccenctric Anomaly to calculate True Anomaly.
 
@@ -47,7 +47,10 @@ def step_1(T, args, tim):
     '''
     
     ## Eccentric Anomaly
-    E = 0
+    E = args["E"]
+    ## perigee passage
+    T = args["T"]
+
     ## Mean Anomaly
     args["M"] = args["n"] * ( tim - T )
 
@@ -92,3 +95,18 @@ def step_3(args, position, velocity):
 
     velocity[0] = pC * sN * ( -1 )
     velocity[1] = pC * ( e + cN )
+
+
+def step_4(args, position):
+
+    e  = args["e"]
+    N  = args["N"]
+    p  = args["p"]
+    pC = args["pC"]
+
+    cN = cos( N )
+    sN = sin( N )
+
+    r = p / ( 1 + e * cN ) 
+
+    position.append([r*cN, r*sN])
