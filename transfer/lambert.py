@@ -2,7 +2,11 @@
 from optimization import levenbergMarquardt
 
 from numpy import sqrt, cos, sin
+from numpy import arctan2
 from numpy import zeros
+from numpy import cross
+
+from numpy.linalg import norm
 
 
 
@@ -61,6 +65,21 @@ class LambertProblem:
         '''
         Calculate six elements of orbit
         '''
+        orbital_element = {}
+
+        a = s / ( 1 - cos( xS[0] ) )
+
+        r1_ECI = -1
+        r2_ECI = -1
+
+        H = cross( r1_ECI, r2_ECI )
+
+        o = arctan2( -H[0]        , H[1] )
+        i = arctan2( norm( H[:2] ), H[2] )
+
+        orbital_element["a"] = a
+        orbital_element["o"] = o
+        orbital_element["i"] = i
 
 
 def func( x, args ):
