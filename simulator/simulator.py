@@ -1,6 +1,7 @@
 from threading import Thread
 
-from .derivatives import deriv_N, deriv_r
+# from .r_N_deriv import _r_N_run, _r_N_setup
+from .r_v_deriv import deriv_r
 
 from .runge_kutta import _RK4, _A_RK4
 
@@ -9,6 +10,7 @@ from two_body_problem import step_1, step_2, step_3, step_4
 
 from numpy import cos, sin, pi
 from numpy import sqrt
+from numpy import zeros, array
 
 from time import sleep
 
@@ -36,7 +38,7 @@ class Simulator(Thread):
         self.satellite = satellite
         self.geometric = geometric
 
-        self.position = []
+        self.trajectory = []
 
         self.dt = dt
         self.t  = 0
@@ -58,7 +60,10 @@ class Simulator(Thread):
         i = satellite.i
         w = satellite.w
 
-        position = self.position
+        trajectory = self.trajectory
+
+        position = satellite.position
+        velocity = satellite.velocity
 
         ## geometric model
         mu  = geometric.mu
@@ -72,85 +77,27 @@ class Simulator(Thread):
         p = a * ( 1 - ( e ** 2 ) )
 
         args = {
+            "mu": mu,
             "e" : e,
-            "M" : -1,
-            "n" : sqrt( mu / ( a ** 3 ) ),
-            "E" : -1,
-            "eC": sqrt( ( 1 + e ) / ( 1 - e ) ),
-            "N" : -1,
             "p" : p,
-            "pC": sqrt( mu / p ),
-            "T" : T
         }
+
+        dr_dt = deriv_r( args, velocity )
 
         print("initialize finished...")
         print("start simulation")
 
         while self.simulating:
 
-            step_1( args, self.t )
+            _RK4( dr_dt, self.t, position, dt, args=args )
 
-            step_2( args )
-
-            step_4( args, position )
+            trajectory.append(
+                array( position )
+            )
 
             self.t += dt
         
         print(self.t)
-
-
-    # def run(self):
-
-    #     print("initializing")
-
-    #     satellite = self.satellite
-    #     geometric = self.geometric
-
-    #     position = self.position
-
-    #     dt = self.dt
-
-    #     a = satellite.a
-    #     e = satellite.e
-
-    #     ## state
-    #     R_at_pqw = satellite.R_at_pqw
-
-    #     args = { 
-    #         "p" :  a * ( 1 - ( e ** 2 ) ),
-    #         "mu": geometric.mu,
-    #         "N" : satellite.N,
-    #         "e" : satellite.e
-    #     }
-
-    #     dN_dt = deriv_N( args )
-    #     dr_dt = deriv_r( args )
-
-    #     print("initialize finished...")
-    #     print("start simulation")
-
-    #     t = 0
-
-    #     while self.simulating:
-
-    #         R_at_pqw["N"] = _RK4( dN_dt, -1, R_at_pqw["N"], dt, args=R_at_pqw )
-    #         R_at_pqw["r"] = _RK4( dr_dt, -1, R_at_pqw["r"], dt, args=R_at_pqw )
-
-    #         # R_at_pqw["N"] = _A_RK4( dN_dt, -1, R_at_pqw["N"], dt, args=R_at_pqw )
-    #         # R_at_pqw["r"] = _A_RK4( dr_dt, -1, R_at_pqw["r"], dt, args=R_at_pqw )
-
-    #         cN = cos(R_at_pqw["N"])
-    #         sN = sin(R_at_pqw["N"])
-            
-    #         R = R_at_pqw["r"]
-
-    #         position.append([R*cN, R*sN])
-
-    #         t += dt
-
-    #     self.t = t
-
-    #     print(self.t)
 
 
     def stop(self):

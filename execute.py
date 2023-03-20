@@ -6,11 +6,11 @@ from ground           import GroundControlStation
 from transfer         import LambertProblem
 from simulator        import Simulator
 
-from time import time, sleep
+from time import time
 
 
 
-def do_simulate( dt=10 ):
+def do_simulate( dt=0.1, dnm=1 ):
 
     timer = GlobalTim()
 
@@ -29,12 +29,14 @@ def do_simulate( dt=10 ):
 
     simul.start()
 
-    while simul.t < ( Sate1.period ):
+    while simul.t < ( Sate1.period / dnm ):
         pass
 
     simul.stop()
 
-    return simul.position
+    period = int( Sate1.period / ( dnm * dt ) )
+
+    return simul.trajectory[:period]
 
 
 def do_realtime():
