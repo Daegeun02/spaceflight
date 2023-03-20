@@ -1,18 +1,12 @@
 from threading import Thread
 
-# from .r_N_deriv import _r_N_run, _r_N_setup
 from .r_v_deriv import deriv_r
 
 from .runge_kutta import _RK4, _A_RK4
 
-from two_body_problem import TwoBodyOrbit
-from two_body_problem import step_1, step_2, step_3, step_4
-
-from numpy import cos, sin, pi
+from numpy import pi
 from numpy import sqrt
-from numpy import zeros, array
-
-from time import sleep
+from numpy import array
 
 
 
