@@ -72,14 +72,28 @@ class LambertProblem:
         r1_ECI = -1
         r2_ECI = -1
 
-        H = cross( r1_ECI, r2_ECI )
+        h = cross( r1_ECI, r2_ECI )
 
-        o = arctan2( -H[0]        , H[1] )
-        i = arctan2( norm( H[:2] ), H[2] )
+        o = arctan2( -h[0]        , h[1] )
+        i = arctan2( norm( h[:2] ), h[2] )
 
         orbital_element["a"] = a
         orbital_element["o"] = o
         orbital_element["i"] = i
+
+        H = zeros((3,3))
+        H[0,1] =  h[2]
+        H[0,2] = -h[1]
+        H[1,0] = -h[2]
+        H[1,2] =  h[0]
+        H[2,0] =  h[1]
+        H[2,1] = -h[0]
+
+        args = {
+            "a" : a,
+            "mu": mu,
+            "H" : H
+        }
 
 
 def func( x, args ):
