@@ -10,7 +10,7 @@ from time import time
 
 
 
-def do_simulate( dt=0.1, dnm=0.1 ):
+def do_simulate( dt=0.1, dnm=1 ):
 
     timer = GlobalTim()
 
