@@ -1,12 +1,12 @@
 from threading import Thread
 
-from .r_v_deriv import deriv_r
+from .r_v_deriv import deriv_x
 
 from .runge_kutta import _RK4, _A_RK4
 
 from numpy import pi
 from numpy import sqrt
-from numpy import array
+from numpy import array, zeros
 
 
 
@@ -56,9 +56,6 @@ class Simulator(Thread):
 
         trajectory = self.trajectory
 
-        position = satellite.position
-        velocity = satellite.velocity
-
         ## geometric model
         mu  = geometric.mu
 
@@ -74,19 +71,26 @@ class Simulator(Thread):
             "mu": mu,
             "e" : e,
             "p" : p,
+            "control": zeros(3)
         }
 
-        dr_dt = deriv_r( args, velocity )
+        satellite.init_state( args )
+
+        x    = satellite.state
+        xdot = zeros(6)
+
+
+        dx_dt = deriv_x( args, xdot )
 
         print("initialize finished...")
         print("start simulation")
 
         while self.simulating:
 
-            _RK4( dr_dt, self.t, position, dt, args=args )
+            _RK4( dx_dt, self.t, x, dt, args=args )
 
             trajectory.append(
-                array( position )
+                array( x )
             )
 
             self.t += dt

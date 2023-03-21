@@ -1,7 +1,33 @@
+## calculate derivative of position and velocity on ECI coordinate system
 from numpy import sqrt
 from numpy import arctan2
 from numpy import cos, sin
 
+from numpy.linalg import norm
+
+
+
+def deriv_x( args, out ):
+
+    m = args["mu"]
+
+    def dx_dt( t, x, args ):
+
+        control = args["control"]
+
+        position = x[:3]
+        velocity = x[3:]
+
+        r_cube = norm( position ) ** 3
+
+        out[:3] = velocity
+        out[3:] = (-1) * ( m / r_cube ) * position[:]
+
+        out[3:] += control[:]
+
+        return out
+
+    return dx_dt
 
 
 def deriv_r( args, out ):
@@ -20,7 +46,20 @@ def deriv_r( args, out ):
 
         out[0] = c * sin( N ) * (-1)
         out[1] = c * ( e + cos( N ) )
-
-        return out
     
     return dr_dt
+
+
+def deriv_v( args, out ):
+
+    m = args["mu"]
+
+    def dv_dt( t, v, args ):
+
+        position = args["position"]
+
+        r_cube = norm( position ) ** 3
+
+        out[:] = (-1) * ( m / r_cube ) * position[:]
+
+    return dv_dt
