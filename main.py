@@ -13,7 +13,7 @@ from cvxpy import Variable
 
 if __name__ == "__main__":
 
-    trajectory = do_simulate(dt=0.1, dnm=0.1)
+    trajectory = do_simulate(dt=0.1, dnm=1)
 
     trajectory = array( trajectory )
 
