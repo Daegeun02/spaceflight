@@ -11,7 +11,7 @@ class NewtonRaphson:
         self.itr = itr
 
 
-    def solve(self, func, grad, x0, args):
+    def solve(self, func, grad, x0):
         '''
         root = newtonRaphson(
             func, grad, x0, args
@@ -29,15 +29,14 @@ class NewtonRaphson:
         tol = self.tol
         itr = self.itr
 
-        if ( func( x0, args ) == 0.0 ):
-            return x0
-
         xK = x0
-        dx = 1e8
+
+        if ( func( xK ) == 0.0 ):
+            return xK
 
         for _ in range( itr ):
-            f = func( xK, args ) 
-            g = grad( xK, args )
+            f = func( xK ) 
+            g = grad( xK )
 
             if ( abs( f ) < tol ):
                 return xK
@@ -51,7 +50,3 @@ class NewtonRaphson:
             xK -= dx
 
         print('NewtonRaphson fail to find root of given function')
-
-
-    def tune_hyper_parameter(self):
-        pass

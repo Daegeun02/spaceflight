@@ -1,5 +1,7 @@
 ## Levenberg-Marquardt Alogorithm
-from numpy        import eye 
+from numpy import eye 
+from numpy import zeros_like
+
 from numpy.linalg import norm, inv
 
 
@@ -14,7 +16,7 @@ class LevenbergMarquardt:
         self.itr = itr
 
 
-    def solve(self, func, jacb, x0, args):
+    def solve(self, func, jacb, x0):
         '''
         root = levenbergMarquardt( 
             func, jacb, x0, args
@@ -32,26 +34,42 @@ class LevenbergMarquardt:
         tol = self.tol
         itr = self.itr
 
-        val = func( x0, args )
-        dim = len( val )
+        _xK = x0
+        uxK = zeros_like( x0 )
+        _f = func( _xK )        ## object function
+        pf = zeros_like( _f )   ## previous object
 
+        ## initialize lambda
+        dim = len( _f )
         lam = lam * eye( dim )
 
-        if ( norm( val ) == 0.0 ):
-            return x0
-
-        xK = x0
-        dx = 1e8
-
         for _ in range( itr ):
-            f = func( xK, args )
-            J = jacb( xK, args )
+            Df = jacb( _xK )
+            ## 1. check optimality condition
+            opt_cond = Df.T @ _f
 
-            if ( norm( f ) < tol ):
-                return xK
-            
-            dx = inv( J.T @ J + lam ) @ J.T @ f
+            if ( norm( opt_cond ) < tol ):
+                return _xK
 
-            xK -= dx
+            ## 2. update xK
+            dx = inv( Df.T @ Df + lam ) @ opt_cond
+
+            uxK[:] = _xK - dx
+
+            ## remember previous objects
+            pf[:] = _f
+
+            ## re evaluate objects
+            _f = func( uxK )
+
+            ## 3. check tentative iterate
+            if ( norm( _f ) < norm( pf ) ):
+                ## update xK
+                _xK[:] = uxK
+                lam *= 0.8
+            else:
+                ## do not update xK
+                _f[:] = pf
+                lam *= 2.0
 
         print('Levenberg-Marquardt fail to find root of given function')
