@@ -52,77 +52,62 @@ class LambertProblem:
 
         args = {
             "T": T,
-            "q": q,
-            "f": zeros(2),
-            "J": zeros((2,2))
+            "q": q
         }
 
+        f = zeros(2)
+        J = zeros((2,2))
+
         x0 = zeros( 2 )
+
+        func = LP_func( args, f ) 
+        jacb = LP_jacb( args, J )
 
         ## solve with alpha, beta by levenberg-marquardt algorithm
         xS = levenbergMarquardt( func, jacb, x0, args )
 
-        '''
-        Calculate six elements of orbit
-        '''
-        orbital_element = {}
-
         a = s / ( 1 - cos( xS[0] ) )
 
-        r1_ECI = -1
-        r2_ECI = -1
-
-        h = cross( r1_ECI, r2_ECI )
-
-        o = arctan2( -h[0]        , h[1] )
-        i = arctan2( norm( h[:2] ), h[2] )
-
-        orbital_element["a"] = a
-        orbital_element["o"] = o
-        orbital_element["i"] = i
-
-        H = zeros((3,3))
-        H[0,1] =  h[2]
-        H[0,2] = -h[1]
-        H[1,0] = -h[2]
-        H[1,2] =  h[0]
-        H[2,0] =  h[1]
-        H[2,1] = -h[0]
-
-        args = {
-            "a" : a,
-            "mu": mu,
-            "H" : H
-        }
+        return a
 
 
-def func( x, args ):
-
-    a, b = x
+def LP_func( args, out ):
 
     T = args["T"]
     q = args["q"]
-    f = args["f"]
 
-    f[0] = sin( b / 2 ) - q * sin( a / 2 )
-    f[1] = T * ( sin( a / 2 ) ** 3 ) - ( a - b - sin( a ) + sin( b ) )
+    def _func( x ):
+
+        a, b = x
+
+        out[0] = sin( b / 2 ) - q * sin( a / 2 )
+        out[1] = T * ( sin( a / 2 ) ** 3 ) - ( a - b - sin( a ) + sin( b ) )
+
+        return out
+
+    return _func
 
 
-def jacb( x, args ):
-    
-    a, b = x
+def LP_jacb( args, out ):
 
     T = args["T"]
     q = args["q"]
-    J = args["J"]
 
-    ca2 = cos( a / 2 )
-    sa2 = sin( a / 2 )
+    def _jacb( x ):
 
-    J[0,0] = q * ca2 * (-0.5)
+        a, b = x
 
-    J[1,0] = T * ( sa2 ** 2 ) * ca2 * (1.5) - 1 + cos( a )
+        ca2 = cos( a / 2 )
+        sa2 = sin( a / 2 )
 
-    J[0,1] = ca2 * (0.5)
+        out[0,0] = q * ca2 * (-0.5)
 
-    J[1,1] = 1 - cos( b )
+        out[1,0] = T * ( sa2 ** 2 ) * ca2 * (1.5) - 1 + cos( a )
+
+        out[0,1] = ca2 * (0.5)
+
+        out[1,1] = 1 - cos( b )
+
+        return out
+
+    return _jacb
