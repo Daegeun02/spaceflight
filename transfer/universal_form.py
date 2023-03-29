@@ -5,7 +5,7 @@ from numpy.linalg import norm
 
 
 
-def func( args ):
+def UF_func( args ):
 
     r0 = args["r0"]
     v0 = args["v0"]
@@ -29,7 +29,7 @@ def func( args ):
     return _func
 
 
-def grad( args ):
+def UF_grad( args ):
 
     r0 = args["r0"]
     v0 = args["v0"]
@@ -53,8 +53,8 @@ def grad( args ):
 
 def f_and_g_expression( x, r0, v0, args ):
 
-    a = args["a"]
     m = args["mu"]
+    a = args["a"]
     t = args["t"]
 
     sqrt_a = sqrt( a )
