@@ -5,7 +5,7 @@ from numpy import cos, sin, tan, arctan
 
 
 ## function that find root => estimate Eccentric Anomaly
-def func( E, args ):
+def func( args ):
     '''
     This function represent the relationship between
     Mean Anomaly and Eccentric Anomaly.
@@ -13,14 +13,18 @@ def func( E, args ):
     M = E - e sin( E )
     =>  func( E ) = E - e sin( E ) - M
     '''
-
     e = args["e"]
-    M = args["M"]
 
-    return ( E - e * sin(E) - M )
+    def _func( E ):
+
+        M = args["M"]
+
+        return ( E - e * sin(E) - M )
+    
+    return _func
 
 
-def grad( E, args ):
+def grad( args ):
     '''
     This function represent the derivative of the relationship between
     Mean Anomaly and Eccentric Anomaly.
@@ -28,10 +32,13 @@ def grad( E, args ):
     M = E - e sin( E )
     => grad( E ) = 1 - e cos( E )
     '''
-
     e = args["e"]
 
-    return ( 1 - e * cos(E) )
+    def _grad( E ):
+
+        return ( 1 - e * cos(E) )
+    
+    return _grad
 
 
 ## steps to calculate position and velocity
@@ -51,10 +58,13 @@ def step_1( args, tim ):
     ## perigee passage
     T = args["T"]
 
+    func = args["func"]
+    grad = args["grad"]
+
     ## Mean Anomaly
     args["M"] = args["n"] * ( tim - T )
 
-    args["E"] = newtonRaphson( func, grad, E, args )
+    args["E"] = newtonRaphson( func, grad, E )
 
 
 def step_2(args):
