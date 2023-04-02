@@ -11,6 +11,8 @@ GRAVCONST = 6.674e-11
 
 EARTHMASS = 5.9742e24
 
+MU = GRAVCONST * EARTHMASS / ( 1000 ** 3 )
+
 class EARTH(Thread):
 
 
