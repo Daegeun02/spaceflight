@@ -2,11 +2,10 @@
 from optimization import levenbergMarquardt
 
 from numpy import sqrt, cos, sin
-from numpy import arctan2
+from numpy import pi, arccos
 from numpy import zeros
-from numpy import cross
 
-from numpy.linalg import norm
+from numpy.random import rand
 
 
 
@@ -23,9 +22,9 @@ class LambertProblem:
     calculate six elements of orbit.
     '''
 
-    def __init__(self, geometry):
+    def __init__(self, mu ):
 
-        self.mu = geometry.mu
+        self.mu = mu
 
 
     def solve(self, r1, r2, t1, t2, theta):
@@ -58,15 +57,19 @@ class LambertProblem:
         f = zeros(2)
         J = zeros((2,2))
 
-        x0 = zeros( 2 )
+        x0 = zeros(2) + pi
 
         func = LP_func( args, f ) 
         jacb = LP_jacb( args, J )
 
         ## solve with alpha, beta by levenberg-marquardt algorithm
-        xS = levenbergMarquardt( func, jacb, x0, args )
+        xS = levenbergMarquardt( func, jacb, x0 )
 
-        a = s / ( 1 - cos( xS[0] ) )
+        print(s)
+        print(xS)
+
+        # a = s / ( 1 - cos( xS[0] ) )
+        a = s / ( 2 * sin( xS[0]/2 )**2 )
 
         return a
 
@@ -104,7 +107,7 @@ def LP_jacb( args, out ):
 
         out[1,0] = T * ( sa2 ** 2 ) * ca2 * (1.5) - 1 + cos( a )
 
-        out[0,1] = ca2 * (0.5)
+        out[0,1] = cos( b / 2 ) * (0.5)
 
         out[1,1] = 1 - cos( b )
 

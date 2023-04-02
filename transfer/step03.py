@@ -1,13 +1,13 @@
-from Opt_MV_based_LP import solve
+from .Opt_MV_based_LP import solve
 
 from numpy import zeros
 
 
 
-def step_3( r_chs_0_ORP, v_chs_0_ORP, r_trg_t_ORP, v_trg_t_ORP, theta_t, theta_0, a, geometry ):
+def step03( r_chs_0_ORP, v_chs_0_ORP, r_trg_t_ORP, v_trg_t_ORP, theta_t, theta_0, a, mu ):
 
     args = {
-        "mu": geometry.mu,
+        "mu": mu,
         "a" : a,
         "theta_t": theta_t,
         "theta_0": theta_0,
@@ -28,6 +28,6 @@ def step_3( r_chs_0_ORP, v_chs_0_ORP, r_trg_t_ORP, v_trg_t_ORP, theta_t, theta_0
 
     x = solve( args )
 
-    Dv0, Dv1, e, w = x
+    Dv0, Dv1, e, w = x[0:3], x[3:6], x[ 6 ], x[ 7 ]
 
     return Dv0, Dv1, e, w

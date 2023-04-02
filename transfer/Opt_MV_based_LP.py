@@ -3,14 +3,15 @@ from .AL_func import AL_func, AL_jacb
 from numpy import zeros, eye
 
 from numpy.linalg import norm, inv
+from numpy.linalg import cond
 
 
 
 def solve( args ):
 
     ## Augmented Lagrangian algorithm
-    _xK = zeros(4)          ## Initial point
-    uxK = zeros(4)          ## updated point
+    _xK = zeros(8)          ## Initial point
+    uxK = zeros(8)          ## updated point
 
     _zK = zeros(6)          ## lagrange multiplier
     _uK = 1                 ## augmented variable
@@ -26,7 +27,7 @@ def solve( args ):
     jacb = AL_jacb( args, DJ )
 
     tol = 1e-8
-    lam = 1 * eye( 8 )
+    lam = 10 * eye( 8 )
     mit = 1000
 
     _f, _g = func( _xK )
@@ -36,13 +37,16 @@ def solve( args ):
         Df, Dg = jacb( _xK )
 
         ## optimality condition
-        opt_cond = 2 * Df.T @ _f + Dg.T @ ( 2 * _uK * _g + _zK )
+        opt_cond = 2 * _f * Df.T + Dg.T @ ( 2 * _uK * _g + _zK )
 
         if ( norm( opt_cond ) < tol ):
             return _xK
 
         ## update xK
         dx = inv( DJ.T @ DJ + lam ) @ DJ.T @ _J
+
+        print(cond(DJ.T @ DJ + lam))
+        raise ValueError
 
         uxK[:] = _xK - dx
         ## remember previous objects
@@ -60,8 +64,8 @@ def solve( args ):
         else:
             ## do not update xK
             _J[:] = PJ
-            _f[:] = pf
             _g[:] = pg
+            _f    = pf
             lam *= 2.0
 
         ''' Update z, lagrange multiplier '''
@@ -73,4 +77,4 @@ def solve( args ):
         else:
             _uK *= 2.0
 
-    return 
+    print('fail to find solution')

@@ -1,5 +1,5 @@
-from universal_form import UF_func, UF_grad
-from universal_form import f_and_g_expression
+from .universal_form import UF_func, UF_grad
+from .universal_form import f_and_g_expression
 
 from optimization import newtonRaphson
 
@@ -8,9 +8,7 @@ from numpy import cos, sin
 
 
 
-def step_1( r_trg_0_ECI, v_trg_0_ECI, O_trg, t_tof, geometry ):
-
-    mu = geometry.mu
+def step01( r_trg_0_ECI, v_trg_0_ECI, O_trg, t_tof, mu ):
 
     ## 1. transform coordinate system
     a = O_trg["a"]
@@ -18,10 +16,10 @@ def step_1( r_trg_0_ECI, v_trg_0_ECI, O_trg, t_tof, geometry ):
     i = O_trg["i"]
     w = O_trg["w"]
 
-    R = PQW2ECI( o, i, w )
+    R = ECI2PQW( o, i, w )
 
-    r_trg_0_PQW = R.T @ r_trg_0_ECI
-    v_trg_0_PQW = R.T @ v_trg_0_ECI
+    r_trg_0_PQW = R @ r_trg_0_ECI
+    v_trg_0_PQW = R @ v_trg_0_ECI
     r_trg_t_PQW = zeros_like( r_trg_0_PQW )
     v_trg_t_PQW = zeros_like( v_trg_0_PQW )
 
@@ -40,13 +38,13 @@ def step_1( r_trg_0_ECI, v_trg_0_ECI, O_trg, t_tof, geometry ):
 
     r_trg_t_PQW, v_trg_t_PQW = f_and_g_expression( x, r_trg_0_PQW, v_trg_0_PQW, args )
 
-    r_trg_t_ECI = R @ r_trg_t_PQW
-    v_trg_t_ECI = R @ v_trg_t_PQW
+    r_trg_t_ECI = R.T @ r_trg_t_PQW
+    v_trg_t_ECI = R.T @ v_trg_t_PQW
 
     return r_trg_t_ECI, v_trg_t_ECI
 
 
-def PQW2ECI( o, i, w ):
+def ECI2PQW( o, i, w ):
 
     R = zeros((3,3))
     

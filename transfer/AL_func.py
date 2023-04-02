@@ -63,7 +63,7 @@ def AL_func( args, out ):
         R^8 -> R^7
         '''
         ## minimizer
-        Dv0, Dv1, e, w = x
+        Dv0, Dv1, e, w = x[0:3], x[3:6], x[ 6 ], x[ 7 ]
 
         ## evaluate parameters
         tri_t[:] = cos( theta_t-w ), sin( theta_t-w )
@@ -109,7 +109,7 @@ def AL_jacb( args, out ):
         R^8 -> R^7 x R^8
         '''
         ## minimizer
-        Dv0, Dv1, e, w = x
+        Dv0, Dv1, e, w = x[0:3], x[3:6], x[ 6 ], x[ 7 ]
 
         ## jacobian
         out[ 0 ,0:3] = Dv0
@@ -120,8 +120,8 @@ def AL_jacb( args, out ):
 
         out[4:7,3:6] = -I
 
-        out[1:7, 7 ] = partial_e( x )
-        out[1:7, 8 ] = partial_w( x )
+        out[1:7, 6 ] = partial_e( x )
+        out[1:7, 7 ] = partial_w( x )
 
         ##     object      , constraint
         return out[ 0 ,0:8], out[1:7,0:8]
@@ -151,7 +151,7 @@ def f_and_g( args ):
 
     def _f_and_g( x ):
         ## minimizer
-        Dv0, Dv1, e, w = x
+        Dv0, Dv1, e, w = x[0:3], x[3:6], x[ 6 ], x[ 7 ]
 
         ## evaluate parameters
         ct, st = tri_t
@@ -193,7 +193,7 @@ def partial_fg_e( args, out ):
 
     def _partial_fg_e( x ):
         ## minimizer
-        Dv0, Dv1, e, w = x
+        Dv0, Dv1, e, w = x[0:3], x[3:6], x[ 6 ], x[ 7 ]
 
         ## evaluate parameters
         ct, st = tri_t
@@ -247,7 +247,7 @@ def partial_fg_w( args, out ):
 
     def _partial_fg_w( x ):
         ## minimizer
-        Dv0, Dv1, e, w = x
+        Dv0, Dv1, e, w = x[0:3], x[3:6], x[ 6 ], x[ 7 ]
 
         ## evaluate parameters
         ct, st = tri_t

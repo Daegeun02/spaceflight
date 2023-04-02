@@ -1,5 +1,6 @@
 from numpy import cos, sin
 from numpy import sqrt
+from numpy import dot
 
 from numpy.linalg import norm
 
@@ -16,12 +17,14 @@ def UF_func( args ):
     sqrt_a = sqrt( a )
     sqrt_m = sqrt( m )
 
+    _r0 = norm( r0 )
+
     def _func( x ):
 
         out = 0.0
         out += a * ( x - sqrt_a * sin( x / sqrt_a ) )
-        out += ( r0 * v0 / sqrt_m ) * a * ( 1 - cos( x / sqrt_a ) )
-        out += r0 * sqrt_a * sin( x / sqrt_m )
+        out += ( dot( r0, v0 ) / sqrt_m ) * a * ( 1 - cos( x / sqrt_a ) )
+        out += _r0 * sqrt_a * sin( x / sqrt_a )
         out -= sqrt_m * t
 
         return out
@@ -39,12 +42,14 @@ def UF_grad( args ):
     sqrt_a = sqrt( a )
     sqrt_m = sqrt( m )
 
+    _r0 = norm( r0 )
+
     def _grad( x ):
 
         out = 0.0
         out += a * ( 1 - cos( x / sqrt_a ) )
-        out += ( r0 * v0 / sqrt_m ) * sqrt_a * sin( x / sqrt_a )
-        out += r0 * cos( x / sqrt_a )
+        out += ( dot( r0, v0 ) / sqrt_m ) * sqrt_a * sin( x / sqrt_a )
+        out += _r0 * cos( x / sqrt_a )
 
         return out
 
