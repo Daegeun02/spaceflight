@@ -21,7 +21,7 @@ def elliptic_orbit( OrbitalElement, dt=1, rev=1 ):
     ## period for a revolution
     period = 2 * pi * sqrt( ( a**3 ) / MU )
     ## number of time steps for a revolution
-    N = int( period / dt ) * rev
+    N = int( rev * period / dt )
 
     ## trajectory
     pos = zeros((N,3))
