@@ -5,7 +5,6 @@ from numpy import sqrt, cos, sin
 from numpy import pi
 from numpy import zeros
 
-from numpy.linalg import norm
 
 
 class LambertProblem:
@@ -21,12 +20,11 @@ class LambertProblem:
     calculate six elements of orbit.
     '''
 
-    def __init__(self, mu):
+    def __init__(self):
+        pass
 
-        self.mu = mu
 
-
-    def solve(self, r1, r2, t1, t2, theta):
+    def solve(self, r1, r2, t1, t2, theta, mu):
         '''
         Literally solve LAMBERT PROBLEM
 
@@ -37,8 +35,6 @@ class LambertProblem:
         t2: time when arriving transfer <br>
         theta: the angle between r1 and r2 vector
         '''
-        mu = self.mu
-
         c = sqrt( 
             ( r1 ** 2 ) + ( r2 ** 2 ) - 2 * r1 * r2 * cos( theta )
         )
@@ -69,25 +65,6 @@ class LambertProblem:
         a = s / ( 1 - cos( xS[0] ) )
 
         return a
-
-
-def get_foci_by_a( a, r_chs_0_ORP, r_trg_t_ORP ):
-
-    r1 = 2*a - norm( r_chs_0_ORP )
-    r2 = 2*a - norm( r_trg_t_ORP )
-
-    x = sqrt( ( r1**2 * r2**2 ) / ( r1**2 + r2**2 ) )
-
-    O = ( r_chs_0_ORP + r_trg_t_ORP ) / 2
-
-    D = zeros(3)
-    D[0] = r_chs_0_ORP[1] - r_trg_t_ORP[1]
-    D[1] = r_trg_t_ORP[0] - r_chs_0_ORP[0]
-
-    F1 = O + D * x
-    F2 = O - D * x
-
-    return F1, F2
 
 
 def LP_func( args, out ):

@@ -1,6 +1,6 @@
 from coordinate import ECI2ORP
 
-from .lambert import LambertProblem
+from lambert import LambertProblem
 
 from numpy import cross
 from numpy import arctan2
