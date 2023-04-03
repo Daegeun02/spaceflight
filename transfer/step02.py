@@ -4,7 +4,6 @@ from numpy import cross
 from numpy import zeros
 from numpy import arctan2
 from numpy import cos, sin
-from numpy import dot
 
 from numpy.linalg import norm
 
@@ -33,13 +32,13 @@ def step02( r_chs_0_ECI, r_trg_t_ECI, t_tof, mu ):
     LP = LambertProblem( mu )
 
     _r_chs_0 = norm( r_chs_0_ECI )
-    _r_trg_0 = norm( r_trg_t_ECI )
+    _r_trg_t = norm( r_trg_t_ECI )
 
     t1 = 0
     t2 = t1 + t_tof
 
     ## solve Lambert Problem
-    a = LP.solve( _r_chs_0, _r_trg_0, t1, t2, theta )
+    a = LP.solve( _r_chs_0, _r_trg_t, t1, t2, theta )
 
     print(a)
 
