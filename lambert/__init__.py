@@ -5,6 +5,8 @@ from .lambert import LambertProblem
 
 from .focus_calculus import get_foci_by_a
 
+from .impulse_control import impulse_ctrl
+
 from numpy import cross, dot
 from numpy import arctan2
 from numpy import arccos
@@ -53,7 +55,6 @@ def LP_solver( r_chs_0_ECI, r_trg_t_ECI, t_tof, mu ):
     a  = LP.solve( r1, r2, 0, t_tof, theta, mu )
 
     R = ECI2ORP( o, i )
-    
     r_chs_0_ORP = R @ r_chs_0_ECI
     r_trg_t_ORP = R @ r_trg_t_ECI
 
@@ -64,5 +65,8 @@ def LP_solver( r_chs_0_ECI, r_trg_t_ECI, t_tof, mu ):
         'o': o,
         'i': i
     }
+
+    # Dv0 = impulse_ctrl( F1, r_chs_0_ORP, v_chs_0_ORP, O_orp, mu )
+    # Dv1 = impulse_ctrl( F2, r_trg_t_ORP, v_trg_t_ORP, O_orp, mu )
 
     return O_orp, r_chs_0_ORP, r_trg_t_ORP

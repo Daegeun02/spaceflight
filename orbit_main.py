@@ -3,7 +3,6 @@ from trajectory import elliptic_orbit
 from lambert import LP_solver
 
 from two_body_problem import estimate
-from two_body_problem import estimate_with_foci
 
 from transfer import step01
 
