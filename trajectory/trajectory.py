@@ -61,6 +61,8 @@ def elliptic_orbit( OrbitalElement, dt=1, rev=1, impulse=None ):
 
     if ( impulse != None ):
         thr_t = [impulse.keys()]
+    else:
+        thr_t = []
 
     for k in range(N-1):
         _RK4( dxdt, t, x, dt, args=args )

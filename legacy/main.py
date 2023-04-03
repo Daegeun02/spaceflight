@@ -1,5 +1,5 @@
-from execute import do_realtime
-from execute import do_simulate
+from legacy.execute import do_realtime
+from legacy.execute import do_simulate
 
 import matplotlib.pyplot as plt
 
