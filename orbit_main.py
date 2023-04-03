@@ -73,7 +73,13 @@ def solve_LP( r_chs_0_ECI, r_trg_t_ECI, t_tof, mu ):
     ## solve Lambert Problem
     a = LP.solve( _r_chs_0, _r_trg_t, t1, t2, theta )
 
-    return a, r_chs_0_ORP, r_trg_t_ORP
+    O_orp = {
+        'a': a,
+        'o': o,
+        'i': i
+    }
+
+    return O_orp, r_chs_0_ORP, r_trg_t_ORP
 
 
 def transfer_impulse( F1, F2, a, r_xxx_x_ORP ):
@@ -95,14 +101,26 @@ if __name__ == "__main__":
         mu=MU
     )
 
-    a, r_chs_0_ORP, r_trg_t_ORP = solve_LP( r_chs_0_ECI, r_trg_t_ECI, t_tof, MU )
+    O_orp, r_chs_0_ORP, r_trg_t_ORP = solve_LP( r_chs_0_ECI, r_trg_t_ECI, t_tof, MU )
+
+    a = O_orp['a']
 
     F1, F2 = get_foci_by_a( a, r_chs_0_ORP, r_trg_t_ORP )
 
-    transfer_impulse( F1, F2, a, r_chs_0_ORP )
+    ae = norm( F2 - F1 )
+    e  = ae / a
+    O_orp['e'] = e
 
+    Dv0 = transfer_impulse( F1, F2, a, r_chs_0_ORP )
+    Dv1 = transfer_impulse( F1, F2, a, r_trg_t_ORP )
+
+    impulse = {
+        0    : Dv0,
+        t_tof: Dv1
+    }
 
     pos_chs, vel_chs = elliptic_orbit( O_chs, rev=2 )
+    pos_orp, vel_orp = elliptic_orbit( O_orp, rev=2, impulse=impulse)
     pos_trg, vel_trg = elliptic_orbit( O_trg, rev=2 )
 
     fig = plt.figure( figsize=( 8,8 ) )
@@ -112,6 +130,12 @@ if __name__ == "__main__":
         pos_chs[:,0],
         pos_chs[:,1],
         pos_chs[:,2]
+    )
+
+    ax.plot3D(
+        pos_orp[:,0],
+        pos_orp[:,1],
+        pos_orp[:,2]
     )
 
     ax.plot3D(

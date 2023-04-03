@@ -1,9 +1,9 @@
+from coordinate import ECI2ORP
+
 from .lambert import LambertProblem
 
 from numpy import cross
-from numpy import zeros
 from numpy import arctan2
-from numpy import cos, sin
 
 from numpy.linalg import norm
 
@@ -43,23 +43,3 @@ def step02( r_chs_0_ECI, r_trg_t_ECI, t_tof, mu ):
     print(a)
 
     return a, o, i, theta_t, theta_0, R
-
-
-def ECI2ORP( o, i ):
-
-    R = zeros((3,3))
-
-    co, so = cos( o ), sin( o )
-    ci, si = cos( i ), sin( i )
-
-    R[0,0] = co
-    R[1,0] = (-1) * so * ci
-    R[2,0] = so * si
-    R[0,1] = so
-    R[1,1] = co * ci
-    R[2,1] = (-1) * co * si
-    R[0,2] = 0
-    R[1,2] = si
-    R[2,2] = ci
-
-    return R

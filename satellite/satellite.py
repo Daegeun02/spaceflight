@@ -1,6 +1,7 @@
+from coordinate import ECI2PQW
+
 from numpy import zeros 
 from numpy import deg2rad
-from numpy import cos, sin
 from numpy import sqrt
 
 
@@ -31,32 +32,11 @@ class Satellite:
         m = args["mu"]
         p = args["p"]
 
-        pqw2eci = self.PQW2ECI( self.o, self.i, self.w )
+        R = ECI2PQW( self.o, self.i, self.w )
 
         self.position[0] = self.a * ( 1 - self.e )
 
         self.velocity[1] = sqrt( m / p ) * ( self.e + 1 )
 
-        self.state[:3] = pqw2eci @ self.position
-        self.state[3:] = pqw2eci @ self.velocity
-
-
-    def PQW2ECI(self, o, i, w):
-
-        pqw2eci = zeros((3,3))
-
-        co, so = cos( o ), sin( o )
-        ci, si = cos( i ), sin( i )
-        cw, sw = cos( w ), sin( w )
-
-        pqw2eci[0,0] = cw * co - sw * ci * so
-        pqw2eci[1,0] = cw * so + sw * ci * co
-        pqw2eci[2,0] = sw * si
-        pqw2eci[0,1] = (-1) * (sw * co + cw * ci * so)
-        pqw2eci[1,1] = cw * ci * co - sw * so
-        pqw2eci[2,1] = cw * si
-        pqw2eci[0,2] = si * so
-        pqw2eci[1,2] = (-1) * si * co
-        pqw2eci[2,2] = ci
-
-        return pqw2eci
+        self.state[:3] = R.T @ self.position
+        self.state[3:] = R.T @ self.velocity

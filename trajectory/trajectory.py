@@ -1,5 +1,7 @@
 from geometry import MU
 
+from coordinate import ECI2PQW
+
 from .r_v_deriv import *
 
 from .runge_kutta import _RK4
@@ -9,7 +11,7 @@ from numpy import zeros
 
 
 
-def elliptic_orbit( OrbitalElement, dt=1, rev=1 ):
+def elliptic_orbit( OrbitalElement, dt=1, rev=1, impulse=None ):
 
     a = OrbitalElement["a"]
     o = OrbitalElement["o"]
@@ -57,33 +59,18 @@ def elliptic_orbit( OrbitalElement, dt=1, rev=1 ):
     pos[0,:] = x[0:3]
     vel[0,:] = x[3:6]
 
+    if ( impulse != None ):
+        thr_t = [impulse.keys()]
+
     for k in range(N-1):
         _RK4( dxdt, t, x, dt, args=args )
 
         pos[k+1,:] = x[0:3]
         vel[k+1,:] = x[3:6]
 
+        if ( t in thr_t ):
+            args["control"] = impulse[t]
+
         t += dt
 
     return pos, vel
-    
-
-def ECI2PQW( o, i, w ):
-
-    R = zeros((3,3))
-    
-    co, so = cos( o ), sin( o )
-    ci, si = cos( i ), sin( i )
-    cw, sw = cos( w ), sin( w )
-
-    R[0,0] = cw * co - sw * ci * so
-    R[1,0] = (-1) * (sw * co + cw * ci * so)
-    R[2,0] = si * so
-    R[0,1] = cw * so + sw * ci * co
-    R[1,1] = cw * ci * co - sw * so
-    R[2,1] = (-1) * si * co
-    R[0,2] = sw * si
-    R[1,2] = cw * si
-    R[2,2] = ci
-
-    return R

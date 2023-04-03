@@ -13,17 +13,17 @@ def deriv_x( args, out ):
 
     def dx_dt( t, x, args ):
 
-        # control = args["control"]
-
         position = x[:3]
         velocity = x[3:]
 
         r_cube = norm( position ) ** 3
 
         out[:3] = velocity
-        out[3:] = (-1) * ( m / r_cube ) * position[:]
+        out[3:] = (-1) * ( m / r_cube ) * position
 
-        # out[3:] += control[:]
+        out[3:] += args["control"]
+
+        args["control"][:] = 0
 
         return out
 
