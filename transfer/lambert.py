@@ -2,7 +2,7 @@
 from optimization import levenbergMarquardt
 
 from numpy import sqrt, cos, sin
-from numpy import pi, arccos
+from numpy import pi
 from numpy import zeros
 
 from numpy.random import rand
@@ -68,8 +68,7 @@ class LambertProblem:
         print(s)
         print(xS)
 
-        # a = s / ( 1 - cos( xS[0] ) )
-        a = s / ( 2 * sin( xS[0]/2 )**2 )
+        a = s / ( 1 - cos( xS[0] ) )
 
         return a
 
