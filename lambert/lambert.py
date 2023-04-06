@@ -5,6 +5,8 @@ from numpy import sqrt, cos, sin
 from numpy import pi
 from numpy import zeros
 
+from numpy.random import rand
+
 
 
 class LambertProblem:
@@ -58,9 +60,6 @@ class LambertProblem:
 
         ## solve with alpha, beta by levenberg-marquardt algorithm
         xS = levenbergMarquardt( func, jacb, x0 )
-
-        print(s)
-        print(xS)
 
         a = s / ( 1 - cos( xS[0] ) )
 

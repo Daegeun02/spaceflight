@@ -57,7 +57,7 @@ def estimate_with_foci( F1, F2, a, mu, t ):
 
     ae = norm( F2 - F1 )
 
-    e = ae / a
+    e = ae / (2 * a)
 
     p = a * ( 1 - ( e**2 ) )
 

@@ -21,9 +21,9 @@ def deriv_x( args, out ):
         out[:3] = velocity
         out[3:] = (-1) * ( m / r_cube ) * position
 
-        out[3:] += args["control"]
+        # out[3:] += args["control"]
 
-        args["control"][:] = 0
+        # args["control"][:] = 0
 
         return out
 

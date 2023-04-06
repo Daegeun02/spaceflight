@@ -1,36 +1,34 @@
+from coordinate import ECI2PQW
+
 from numpy import cos, sin
 from numpy import arctan2
 from numpy import sqrt
 from numpy import zeros
 
-from numpy.linalg import norm
 
 
-
-def impulse_ctrl( F, r_xxx_x_ORP, v_xxx_x_ORP, O_orp, mu ):
+def impulse_ctrl( r_xxx_x_ECI, v_xxx_x_ECI, O_orp, mu ):
     ## orbital element
     a = O_orp['a']
+    e = O_orp['e']
     o = O_orp['o']
     i = O_orp['i']
-    ## angular position
-    theta = arctan2( r_xxx_x_ORP[1], r_xxx_x_ORP[0] )
-    ## find eccentricity and argument perigee
-    ae = norm( F )
-    e  = ae / a
-    w  = arctan2( F[1], F[0] )
-    ## true anomaly
-    N = theta - w
+    w = O_orp['w']
+
     p = a * ( 1 - e**2 )
     C = sqrt( mu / p )
-    ## velocity for enter the transfer orbit
-    v_xxx_x_TRF = zeros(3)
-    v_xxx_x_TRF[0] = ( -C ) * sin( N )
-    v_xxx_x_TRF[1] = C * ( e + cos( N ) )
-    ## impulse control
+
+    R = ECI2PQW( o, i, w )
+
+    r_xxx_x_PQW = R @ r_xxx_x_ECI
+
+    f = arctan2( r_xxx_x_PQW[1], r_xxx_x_PQW[0] )
+
+    v_xxx_x_PQW = zeros(3)
+    v_xxx_x_PQW[0] = ( -C ) * sin( f )
+    v_xxx_x_PQW[1] = C * ( e + cos( f ) )
+
     Dv_    = zeros(3)
-    Dv_[:] = v_xxx_x_TRF - v_xxx_x_ORP
-    ## store orbital element
-    O_orp['e'] = e
-    O_orp['w'] = w
+    Dv_[:] = ( R.T @ v_xxx_x_PQW ) - v_xxx_x_ECI
 
     return Dv_
