@@ -50,6 +50,13 @@ if __name__ == "__main__":
         t_tof=t_tof,
         mu=MU
     )
+    from numpy import array
+
+    r_chs_0_ECI = array([-4817125.45252103,  6686822.28003353,   4733995.47838338])/1000
+    r_trg_0_ECI = array([6173370.41375728,   -1283430.23115325,   1420977.30181397])/1000
+    r_trg_t_ECI = array([3593880.39015734,   6039992.84954113,   2415126.18863007])/1000
+
+    t_tof = 1000
 
     O_orp, Dv0, Dv1, F1, F2 = LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
 

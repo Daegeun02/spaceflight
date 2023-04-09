@@ -1,6 +1,5 @@
 ## lambert problem solver
 from coordinate import ECI2ORP
-from coordinate import ECI2PQW
 
 from .lambert import LambertProblem
 
@@ -56,6 +55,8 @@ def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
     a  = LP.solve( r1, r2, 0, t_tof, theta, mu )
 
     print( a )
+
+    raise ValueError
 
     R = ECI2ORP( o, i )
     r_chs_0_ORP = R @ r_chs_0_ECI
