@@ -129,13 +129,10 @@ def NN_jacb( configs, out ):
     ## target's partial derivatives
     trg_pEpx = pEpx( trg_configs, trg_args )
     trg_pEpt = pEpt( trg_configs, trg_args )
-    trg_pEpa = pEpa( trg_configs, trg_args )
     trg_prpx = prpx( trg_configs, trg_args )
     trg_prpt = prpt( trg_configs, trg_args )
-    trg_prpa = prpa( trg_configs, trg_args )
     trg_pvpx = pvpx( trg_configs, trg_args )
     trg_pvpt = pvpt( trg_configs, trg_args )
-    trg_pvpa = pvpa( trg_configs, trg_args )
 
     ## chaser's partial derivatives
     chs_pEpx = pEpx( chs_configs, chs_args )
