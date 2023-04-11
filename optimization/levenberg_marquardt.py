@@ -1,4 +1,4 @@
-## Levenberg-Marquardt Alogorithm
+## Levenberg-Marquardt Algorithm
 from numpy import eye 
 from numpy import zeros_like
 
