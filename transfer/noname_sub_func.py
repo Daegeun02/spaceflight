@@ -1,6 +1,3 @@
-from math import sqrt
-from math import cos, sin
-
 from numpy import dot
 from numpy import zeros
 

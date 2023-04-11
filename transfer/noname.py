@@ -11,6 +11,7 @@ from numpy import zeros, eye
 from numpy.linalg import norm
 
 
+
 def NN_func( configs, out ):
 
     Tr0 = configs["r_trg_0_ECI"]       ## initial position of target
