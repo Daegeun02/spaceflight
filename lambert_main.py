@@ -16,21 +16,23 @@ from numpy import deg2rad
 
 
 
-t_tof = 7000
+t_tof = 8000
+t_chs = 1000
+t_trg = 8000
 
 O_chs = {
     "a": 7000,
     "o": deg2rad( 0 ),
     "i": deg2rad( 0 ),
     "w": deg2rad( 30 ),
-    "e": 0,
+    "e": 0.1,
     "T": 0
 }
 
 O_trg = {
-    "a": 50000,
-    "o": deg2rad( 50 ),
-    "i": deg2rad( 80 ),
+    "a": 20000,
+    "o": deg2rad( 30 ),
+    "i": deg2rad( 30 ),
     "w": deg2rad( 0 ),
     "e": 0.5,
     "T": 0
@@ -39,9 +41,11 @@ O_trg = {
 
 if __name__ == "__main__":
 
-    r_chs_0_ECI, v_chs_0_ECI = estimate( O_chs, MU, 0 )
+    r_chs_0_ECI, v_chs_0_ECI = estimate( O_chs, MU, t_chs )
 
-    r_trg_0_ECI, v_trg_0_ECI = estimate( O_trg, MU, 0 )
+    r_trg_0_ECI, v_trg_0_ECI = estimate( O_trg, MU, t_trg )
+
+    r_trg_T_ECI, v_trg_T_ECI = estimate( O_trg, MU, t_trg+t_tof )
 
     r_trg_t_ECI, v_trg_t_ECI = step01( 
         r_trg_0_ECI=r_trg_0_ECI,
@@ -50,13 +54,6 @@ if __name__ == "__main__":
         t_tof=t_tof,
         mu=MU
     )
-    from numpy import array
-
-    r_chs_0_ECI = array([-4817125.45252103,  6686822.28003353,   4733995.47838338])/1000
-    r_trg_0_ECI = array([6173370.41375728,   -1283430.23115325,   1420977.30181397])/1000
-    r_trg_t_ECI = array([3593880.39015734,   6039992.84954113,   2415126.18863007])/1000
-
-    t_tof = 1000
 
     O_orp, Dv0, Dv1, F1, F2 = LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
 
@@ -65,10 +62,10 @@ if __name__ == "__main__":
         t_tof: Dv1
     }
 
-    pos_chs, vel_chs = elliptic_orbit( O_chs, rev=1 )
-    pos_orp, vel_orp = elliptic_orbit( O_orp, r_chs_0_ECI, v_chs_0_ECI, rev=1, impulse=impulse)
+    pos_chs  , vel_chs   = elliptic_orbit( O_chs, rev=1 )
+    pos_orp  , vel_orp   = elliptic_orbit( O_orp, r_chs_0_ECI, v_chs_0_ECI, rev=1, impulse=impulse)
     pos_orp_o, vel_orp_o = elliptic_orbit( O_orp, r_chs_0_ECI, rev=1 )
-    pos_trg, vel_trg = elliptic_orbit( O_trg, rev=1 )
+    pos_trg  , vel_trg   = elliptic_orbit( O_trg, rev=1 )
 
     fig = plt.figure( figsize=( 8,8 ) )
     ax  = plt.axes( projection='3d' )
@@ -77,7 +74,8 @@ if __name__ == "__main__":
         0,
         0,
         0,
-        label=' earth '
+        label=' earth ',
+        s=500
     )
 
     ax.scatter(
@@ -103,12 +101,28 @@ if __name__ == "__main__":
         alpha=0.3
     )
 
+    ax.plot3D(
+        pos_chs[0:t_chs,0],
+        pos_chs[0:t_chs,1],
+        pos_chs[0:t_chs,2],
+        label=' chaser ',
+        color='b'
+    )
+
     ax.scatter( 
         r_chs_0_ECI[0],
         r_chs_0_ECI[1],
         r_chs_0_ECI[2],
         label=" chaser's initial point ",
         color='b'
+    )
+
+    ax.scatter(
+        pos_orp[t_tof,0],
+        pos_orp[t_tof,1],
+        pos_orp[t_tof,2],
+        color='g',
+        s=500
     )
 
     ax.plot3D(
@@ -146,9 +160,9 @@ if __name__ == "__main__":
     )
 
     ax.plot3D(
-        pos_trg[:t_tof,0],
-        pos_trg[:t_tof,1],
-        pos_trg[:t_tof,2],
+        pos_trg[t_trg:t_trg+t_tof,0],
+        pos_trg[t_trg:t_trg+t_tof,1],
+        pos_trg[t_trg:t_trg+t_tof,2],
         label=' target trajectory ',
         color='r'
     )

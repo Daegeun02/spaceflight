@@ -99,8 +99,8 @@ def FG_func( configs, out ):
     r0 = configs["r0"]
     v0 = configs["v0"]
     m  = configs["mu"]
-    a  = configs["_a"]
-    t  = configs["_t"]
+    a  = configs["a"]
+    t  = configs["t"]
 
     _r0 = norm( r0 )
 

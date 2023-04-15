@@ -1,15 +1,18 @@
 ## lambert problem solver
 from coordinate import ECI2ORP
 
+from transfer import cross_check
+
+from two_body_problem import true_anomaly
+
 from .lambert import LambertProblem
 
 from .focus_calculus import get_foci_by_a, get_elem_by_foci
 
 from .impulse_control import impulse_ctrl
 
-from numpy import cross, dot
-from numpy import arctan2
-from numpy import arccos
+from numpy import cross, sqrt
+from numpy import arctan2, pi
 
 from numpy.linalg import norm
 
@@ -46,21 +49,22 @@ def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
     r1 = norm( r_chs_0_ECI )
     r2 = norm( r_trg_t_ECI )
 
+    R = ECI2ORP( o, i )
+    r_chs_0_ORP = R @ r_chs_0_ECI
+    r_trg_t_ORP = R @ r_trg_t_ECI
+
     ## angle between two vectors
-    value = dot( r_chs_0_ECI, r_trg_t_ECI ) / ( r1 * r2 )
-    theta = arccos( value )
+    N_chs_ORP = arctan2( r_chs_0_ORP[1], r_chs_0_ORP[0] )
+    N_trg_ORP = arctan2( r_trg_t_ORP[1], r_trg_t_ORP[0] )
+    theta     = N_trg_ORP - N_chs_ORP
+
+    print( theta )
 
     ## solve Lambert Problem so calculate semimajor axis
     LP = LambertProblem( )
     a  = LP.solve( r1, r2, 0, t_tof, theta, mu )
 
-    print( a )
-
-    raise ValueError
-
-    R = ECI2ORP( o, i )
-    r_chs_0_ORP = R @ r_chs_0_ECI
-    r_trg_t_ORP = R @ r_trg_t_ECI
+    print( 2 * pi * sqrt( a**3 / mu ))
 
     F1, F2 = get_foci_by_a( a, r_chs_0_ORP, r_trg_t_ORP )
 
@@ -77,6 +81,14 @@ def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
     ## ORP to ECI
     F1 = R.T @ F1
     F2 = R.T @ F2
+
+    t_TOF = cross_check( 
+        O_orp,
+        r_chs_0_ECI,
+        r_trg_t_ECI
+    )
+
+    print( t_TOF - t_tof )
 
     ## entry burn
     Dv0 = impulse_ctrl( r_chs_0_ECI, v_chs_0_ECI, O_orp, mu )

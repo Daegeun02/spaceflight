@@ -5,6 +5,36 @@ from numpy.linalg import norm
 
 
 
+def calG( configs, args ):
+
+    r0 = configs["r0"]
+    v0 = configs["v0"]
+    m  = configs["mu"]
+    a  = configs["a"]
+    t  = configs["t"]
+
+    _r0 = norm( r0 )
+
+    out = zeros( 2 )
+
+    def _calG( x, t=t, a=a, v0=v0 ):
+
+        sqrt_a = args["sqrt_a"]
+        sqrt_m = args["sqrt_m"]
+        radius = args["radius"]
+
+        cx = args["cx"]
+        sx = args["sx"]
+
+        out[0] = t - ( a / sqrt_m ) * ( x - sqrt_a * sx )
+        out[1] = 1 - ( a / radius ) * ( 1 - cx )
+
+        return out
+
+    return _calG
+
+
+
 def pEpx( configs, args ):
 
     r0 = configs["r0"]
@@ -261,9 +291,26 @@ def pvpa( configs, args ):
     a  = configs["a"]
     t  = configs["t"]
 
+    _r0 = norm( r0 )
+
+    out = zeros( 3 )
+
     def _pvpa( x, t=t, a=a, v0=v0 ):
 
-        out = 0.0
+        sqrt_m = args["sqrt_m"]
+        sqrt_a = args["sqrt_a"]
+        radius = args["radius"]
+
+        cx = args["cx"]
+        sx = args["sx"]
+
+        prpa = 1 + ( (0.5) * dot( r0, v0 ) / sqrt_m ) * ( ( sx / sqrt_a ) - ( x * cx / a ) ) - cx
+        prpa += ( _r0 - a ) * (0.5) * x * (a**(-1.5)) * sx
+
+        pfpa = ( _r0 / sqrt_m ) * ( ( ( prpa / radius**2 ) * sx ) - ( sx / ( radius * 2 * sqrt_a ) ) + ( x * cx / ( radius * 2 * (a**1.5) ) ) )
+        pgpa = ( 1 / radius ) * ( ( prpa * a / radius ) - 1 + cx * ( a * prpa * cx / radius ) + ( (0.5) * x * sx / sqrt_a ) )
+
+        out[:] = pfpa * r0 + pgpa * v0
 
         return out
     

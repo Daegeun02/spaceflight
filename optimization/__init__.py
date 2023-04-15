@@ -12,7 +12,7 @@ newtonRaphson = newtonRaphson.solve
 
 
 lam = 1
-tol = 1.0e-8
+tol = 1.0e-7
 itr = 500
 levenbergMarquardt = LevenbergMarquardt( lam, tol, itr )
 levenbergMarquardt = levenbergMarquardt.solve

@@ -1,5 +1,9 @@
 ## Augmented Lagrangian Algorithm
-from numpy import zeros
+from math import sqrt 
+
+from numpy import zeros, array
+
+from numpy.linalg import norm
 
 
 
@@ -19,7 +23,7 @@ class AugmentedLagrangian:
         self.optimizer = optimizer
 
 
-    def solve(self, func, jacb, x0, n_obj, n_cns):
+    def solve(self, func, jacb, x0, n_obj, n_cns, lam=-1):
         '''
         minimizer = augmentedLagrangian(
             func, jacb, x0, n_obj, n_cns
@@ -43,12 +47,80 @@ class AugmentedLagrangian:
 
             n_cns (int): dim of constraint functions' output
         '''
-
-        lam = self.lam
+        if ( lam == -1 ):
+            lam = self.lam
+        else:
+            lam = lam
         tol = self.tol
         itr = self.itr
 
-        m = self.m
-        z = zeros( n_cns )      ## lagrange multiplier
+        fK = zeros( n_obj + n_cns )
+        gP = zeros( n_obj + n_cns )
+        gK = zeros( n_obj + n_cns )
+        DK = zeros((n_obj+n_cns,n_obj+n_cns))
+
+        mK = array([self.m])
+        zK = zeros( n_cns )      ## lagrange multiplier
+
+        ALfunc = rebuild_func( func, zK, mK, n_obj, fK )
+        ALjacb = rebuild_jacb( jacb, zK, mK, n_obj, DK )
 
         optimizer = self.optimizer
+
+        xK = array( x0 ) 
+
+        for _ in range( itr ):
+            ## update x with levenberg marquardt algorithm
+            xK[:] = optimizer( ALfunc, ALjacb, xK, lam=lam )
+
+            fK[:] = ALfunc( xK[:], zK[:], mK )
+            DK[:] = ALjacb( xK[:], zK[:], mK )
+            ## optimality condition
+            optimalCond = 2 * DK[:n_obj,:].T @ fK[:n_obj] + DK[n_obj:,:].T @ ( 2 * mK * fK[n_obj:] + zK )
+            if ( norm( optimalCond ) < tol ):
+                print( optimalCond )
+                return xK
+
+            ## update z 
+            gK[:] = func( xK[:] )
+            zK[:] = zK + 2 * mK * gK[n_obj:]
+
+            ## update m
+            if ( norm( gK[n_obj:] ) < ( 0.25 * norm( gP[n_obj:] ) ) ):
+                pass
+            else:
+                mK *= 2
+
+            gP[:] = gK[:]
+
+        print( "Augmented Lagrangian couldn't find solution...")
+
+
+def rebuild_func( func, z, m, n_obj, out ):
+
+    def _func( x ):
+
+        _m = sqrt( m )
+
+        out[:] = func( x )
+
+        out[n_obj:] = _m * out[n_obj:] + ( z / ( 2 * _m ) )
+
+        return out
+
+    return _func
+
+
+def rebuild_jacb( jacb, z, m, n_obj, out ):
+
+    def _jacb( x ):
+
+        _m = sqrt( m )
+
+        out[:] = jacb( x )
+
+        out[n_obj:,:] = _m * out[n_obj:,:]
+
+        return out
+
+    return _jacb

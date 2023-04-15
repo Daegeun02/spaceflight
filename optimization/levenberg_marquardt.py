@@ -2,7 +2,7 @@
 from numpy import eye 
 from numpy import zeros_like
 
-from numpy.linalg import norm, inv
+from numpy.linalg import norm, inv, cond, eig
 
 
 
@@ -16,7 +16,7 @@ class LevenbergMarquardt:
         self.itr = itr
 
 
-    def solve(self, func, jacb, x0):
+    def solve(self, func, jacb, x0, lam=-1):
         '''
         root = levenbergMarquardt( 
             func, jacb, x0, args
@@ -26,11 +26,14 @@ class LevenbergMarquardt:
         func: f(x), vector variable -> vector valued
         jacb: jacobian matrix of f(x)
         x0  : initial condition
-        args: arguments of func, jacb
+        lam : lambda for regularizer
 
         *** x is vector ***
         '''
-        lam = self.lam
+        if ( lam == -1 ):
+            lam = self.lam
+        else:
+            lam = lam
         tol = self.tol
         itr = self.itr
 
@@ -43,16 +46,23 @@ class LevenbergMarquardt:
         dim = len( _f )
         lam = lam * eye( dim )
 
-        for _ in range( itr ):
+        for _ in range( 500 ):
             Df = jacb( _xK )
             ## 1. check optimality condition
             opt_cond = Df.T @ _f
 
+            # print( Df[2:4,:] )
+            # print( Df.shape )
+
             if ( norm( opt_cond ) < tol ):
                 return _xK
+            # print( norm ( opt_cond ) )
 
             ## 2. update xK
             dx = inv( Df.T @ Df + lam ) @ opt_cond
+
+            # print( cond( Df.T @ Df + lam ) )
+            # print( eig( Df.T @ Df + lam )[0] )
 
             uxK[:] = _xK - dx
 
@@ -72,4 +82,5 @@ class LevenbergMarquardt:
                 _f[:] = pf
                 lam *= 2.0
 
+        print( opt_cond )
         print('Levenberg-Marquardt fail to find root of given function')

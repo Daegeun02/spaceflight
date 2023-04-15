@@ -65,7 +65,8 @@ class TwoBodyOrbit(Thread):
             "eC": sqrt( ( 1 + e ) / ( 1 - e ) ),
             "N" : -1,
             "p" : p,
-            "pC": sqrt( mu / p )
+            "pC": sqrt( mu / p ),
+            "T" : T
         }
 
         print('initialize finished...')
@@ -74,7 +75,7 @@ class TwoBodyOrbit(Thread):
 
         while self.estimating:
 
-            step_1( T, args, globaltim.tim )
+            step_1( args, globaltim.tim )
 
             step_2( args )
 

@@ -28,16 +28,16 @@ def NN_func( configs, out ):
         "r0": Tr0,
         "v0": Tv0,
         "mu": MU,
-        "_a": trg_a,
-        "_t": -1
+        "a": trg_a,
+        "t": -1
     }
 
     chs_configs = {
         "r0": Cr0,
         "v0": Cv0,
         "mu": MU,
-        "_a": -1,
-        "_t": -1
+        "a": -1,
+        "t": -1
     }
 
     ## compile
@@ -100,16 +100,16 @@ def NN_jacb( configs, out ):
         "r0": Tr0,
         "v0": Tv0,
         "mu": MU,
-        "_a": trg_a,
-        "_t": -1
+        "a": trg_a,
+        "t": -1
     }
 
     chs_configs = {
         "r0": Cr0,
         "v0": Cv0,
         "mu": MU,
-        "_a": -1,
-        "_t": -1
+        "a": -1,
+        "t": -1
     }
 
     trg_args = {
@@ -127,6 +127,8 @@ def NN_jacb( configs, out ):
     }
 
     ## compile ##
+    ## f and g expression
+    chs_calG = calG( chs_configs, chs_args )
     ## target's partial derivatives
     trg_pEpx = pEpx( trg_configs, trg_args )
     trg_pEpt = pEpt( trg_configs, trg_args )
@@ -196,6 +198,12 @@ def NN_jacb( configs, out ):
         out[4:7, 1 ] = trg_prpx( xT, t=_t,                  )
         out[4:7, 2 ] = trg_prpt( xT, t=_t                   ) - chs_prpt( xC, t=_t, a=_a, v0=Cv0+Dv0 )
         out[4:7, 9 ] = chs_prpa( xC, t=_t, a=_a, v0=Cv0+Dv0 ) * (-1)
+
+        out[ 3 ,3:6] = ( sqrt_a / sqrt_m ) * chs_sx * Cr0
+
+        g, gdot = chs_calG( xC, t=_t, a=_a, v0=Cv0+Dv0 )
+        out[4:7,3:6] = _I * g
+        out[7: ,3:6] = _I * gdot
 
         out[7: , 0 ] = chs_pvpx( xC, t=_t, a=_a, v0=Cv0+Dv0 ) * (-1)
         out[7: , 1 ] = trg_pvpx( xT, t=_t,                  )
