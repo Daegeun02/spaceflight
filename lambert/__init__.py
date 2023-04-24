@@ -1,11 +1,11 @@
 ## lambert problem solver
 from coordinate import ECI2ORP
 
-from transfer import cross_check
-
 from two_body_problem import true_anomaly
 
 from .lambert import LambertProblem
+
+from .cross_check import cross_check
 
 from .focus_calculus import get_foci_by_a, get_elem_by_foci
 
@@ -58,13 +58,9 @@ def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
     N_trg_ORP = arctan2( r_trg_t_ORP[1], r_trg_t_ORP[0] )
     theta     = N_trg_ORP - N_chs_ORP
 
-    print( theta )
-
     ## solve Lambert Problem so calculate semimajor axis
     LP = LambertProblem( )
     a  = LP.solve( r1, r2, 0, t_tof, theta, mu )
-
-    print( 2 * pi * sqrt( a**3 / mu ))
 
     F1, F2 = get_foci_by_a( a, r_chs_0_ORP, r_trg_t_ORP )
 

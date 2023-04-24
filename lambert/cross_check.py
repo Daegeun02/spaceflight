@@ -43,6 +43,4 @@ def cross_check( O_orp, r_chs_0_ECI, r_trg_t_ECI ):
     t_chs = ( M_chs / n ) + T
     t_trg = ( M_trg / n ) + T
 
-    print( t_chs, t_trg )
-
     return t_trg - t_chs

@@ -18,22 +18,22 @@ from numpy import deg2rad
 
 t_tof = 8000
 t_chs = 1000
-t_trg = 8000
+t_trg = 6000
 
 O_chs = {
     "a": 7000,
-    "o": deg2rad( 0 ),
+    "o": deg2rad( 30 ),
     "i": deg2rad( 0 ),
-    "w": deg2rad( 30 ),
+    "w": deg2rad( 0 ),
     "e": 0.1,
     "T": 0
 }
 
 O_trg = {
     "a": 20000,
-    "o": deg2rad( 30 ),
+    "o": deg2rad( 0 ),
     "i": deg2rad( 30 ),
-    "w": deg2rad( 0 ),
+    "w": deg2rad( 30 ),
     "e": 0.5,
     "T": 0
 }
@@ -122,7 +122,7 @@ if __name__ == "__main__":
         pos_orp[t_tof,1],
         pos_orp[t_tof,2],
         color='g',
-        s=500
+        s=50
     )
 
     ax.plot3D(
@@ -143,11 +143,19 @@ if __name__ == "__main__":
     )
 
     ax.plot3D(
-        pos_orp[:,0],
-        pos_orp[:,1],
-        pos_orp[:,2],
+        pos_orp[:t_tof,0],
+        pos_orp[:t_tof,1],
+        pos_orp[:t_tof,2],
         label=' transfer trajectory ',
         color='g'
+    )
+
+    ax.plot3D(
+        pos_orp[t_tof:t_tof+5000,0],
+        pos_orp[t_tof:t_tof+5000,1],
+        pos_orp[t_tof:t_tof+5000,2],
+        label=' 5000s after arrive at rendezvous point ',
+        color='orange'
     )
 
     ax.plot3D(
