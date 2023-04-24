@@ -117,7 +117,6 @@ def FG_func( configs, out ):
         a : semimajor axis
         v0: initial velocity
         '''
-
         sqrt_a = sqrt( a )
 
         f = 1 - ( a / _r0 ) * ( 1 - cos( x / sqrt_a ) )
@@ -128,9 +127,9 @@ def FG_func( configs, out ):
         _r = norm( out[0:3] )
 
         fdot = (-1) * ( ( sqrt_a * sqrt_m ) / ( _r0 * _r ) ) * sin( x / sqrt_a )
-        gdot = 1 - ( a / _r ) * ( 1- cos( x / sqrt_a ) )
+        gdot = 1 - ( a / _r ) * ( 1 - cos( x / sqrt_a ) )
 
-        out[3:6] = fdot * r0 * gdot * v0
+        out[3:6] = fdot * r0 + gdot * v0
 
         return out
     

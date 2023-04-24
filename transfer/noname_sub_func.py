@@ -47,16 +47,9 @@ def pEpx( configs, args ):
 
     def _pEpx( x, t=t, a=a, v0=v0 ):
 
-        sqrt_a = args["sqrt_a"]
-        sqrt_m = args["sqrt_m"]
+        radius = args["radius"]
 
-        cx = args["cx"]
-        sx = args["sx"]
-
-        out = 0.0
-        out += a * ( 1 - cx )
-        out += ( sqrt_a / sqrt_m ) * dot( r0, v0 ) * sx
-        out += _r0 * cx
+        out = radius
 
         return out
 
@@ -75,20 +68,7 @@ def pEpt( configs, args ):
 
     def _pEpt( x, t=t, a=a, v0=v0 ):
 
-        sqrt_m = args["sqrt_m"]
-        sqrt_a = args["sqrt_a"]
-        radius = args["radius"]
-
-        cx = args["cx"]
-        sx = args["sx"]
-
         out = 0.0
-        out += a * ( 1 - cx )
-        out += ( sqrt_a / sqrt_m ) * dot( r0, v0 ) * sx
-        out += _r0 * cx
-        out /= radius
-        out -= 1
-        out *= sqrt_m
 
         return out
     

@@ -59,8 +59,8 @@ def NN_func( configs, out ):
         _a  = X[9]      ## semimajor axis of transfer orbit
 
         ## main object function
-        out[ 0 ] = norm( Dv0 ) * sqrt_2
-        out[ 1 ] = norm( Dv1 ) * sqrt_2
+        out[ 0 ] = norm( Dv0 ) / sqrt_2
+        out[ 1 ] = norm( Dv1 ) / sqrt_2
 
         ## main constraint function
         out[ 2 ] = uf_trg_func( xT, t=_t,       v0=Tv0     )    ## energy equation for traget
@@ -69,8 +69,8 @@ def NN_func( configs, out ):
         fg_trg_func( xT, t=_t,       v0=Tv0     )   ## final state of target
         fg_chs_func( xC, t=_t, a=_a, v0=Cv0+Dv0 )   ## final state of chaser
 
-        out[4:7] = Tvt[0:3] - Cvt[0:3]      ## position constraint
-        out[7: ] = Tvt[3:6] - Cvt[3:6]      ## velocity constraint
+        out[4:7] = Tvt[0:3] - Cvt[0:3]          ## position constraint
+        out[7: ] = Tvt[3:6] - Cvt[3:6] - Dv1    ## velocity constraint
 
         return out
 

@@ -1,7 +1,7 @@
 
 from .universal_form import *
 
-from .cross_check import cross_check
+from .initial_guess import initial_guess_with_LP
 
 from .step01 import step01
 
