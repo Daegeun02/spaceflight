@@ -1,7 +1,10 @@
 ## Augmented Lagrangian Algorithm
+from .levenberg_marquardt import LevenbergMarquardt
+
 from math import sqrt 
 
 from numpy import zeros, array
+from numpy import float32
 
 from numpy.linalg import norm
 
@@ -20,7 +23,8 @@ class AugmentedLagrangian:
         self.z = None
 
         ## generally use Levenberg Marquardt method
-        self.optimizer = optimizer
+        levenbergMarquardt = LevenbergMarquardt( lam, tol, 1 )
+        self.optimizer     = levenbergMarquardt.solve
 
 
     def solve(self, func, jacb, x0, n_obj, n_cns, lam=-1):
@@ -55,11 +59,12 @@ class AugmentedLagrangian:
         itr = self.itr
 
         fK = zeros( n_obj + n_cns )
-        gP = zeros( n_obj + n_cns )
+        fP = zeros( n_obj + n_cns )
         gK = zeros( n_obj + n_cns )
+        gP = zeros( n_obj + n_cns )
         DK = zeros((n_obj+n_cns,n_obj+n_cns))
 
-        mK = array([self.m])
+        mK = array([self.m], dtype=float32)
         zK = zeros( n_cns )      ## lagrange multiplier
 
         ALfunc = rebuild_func( func, zK, mK, n_obj, fK )
@@ -69,29 +74,40 @@ class AugmentedLagrangian:
 
         xK = array( x0 ) 
 
-        for _ in range( itr ):
-            ## update x with levenberg marquardt algorithm
-            xK[:] = optimizer( ALfunc, ALjacb, xK, lam=lam )
+        fK[:] = ALfunc( xK[:] )
 
-            fK[:] = ALfunc( xK[:], zK[:], mK )
-            DK[:] = ALjacb( xK[:], zK[:], mK )
+        for _ in range( itr ):
+            fP[:] = fK
+
+            ## update x with levenberg marquardt algorithm
+            xK[:] = optimizer( ALfunc, ALjacb, xK, lam=lam, force_return=True )
+
+            fK[ : ] = ALfunc( xK[:] )
+            DK[:,:] = ALjacb( xK[:] )
+
             ## optimality condition
-            optimalCond = 2 * DK[:n_obj,:].T @ fK[:n_obj] + DK[n_obj:,:].T @ ( 2 * mK * fK[n_obj:] + zK )
-            if ( norm( optimalCond ) < tol ):
-                print( optimalCond )
+            opt_cond = 2 * DK[:n_obj,:].T @ fK[:n_obj] + DK[n_obj:,:].T @ fK[n_obj:]
+            if ( norm( opt_cond ) < tol ):
                 return xK
 
+            # print( 'opt_cond', norm( opt_cond ) )
+
             ## update z 
-            gK[:] = func( xK[:] )
+            gP[:] = gK
+            gK[:] = func( xK )
             zK[:] = zK + 2 * mK * gK[n_obj:]
 
             ## update m
             if ( norm( gK[n_obj:] ) < ( 0.25 * norm( gP[n_obj:] ) ) ):
                 pass
             else:
-                mK *= 2
+                mK *= 1.2
 
-            gP[:] = gK[:]
+            # print( 'zK', zK )
+            # print( 'mK', mK )
+
+        print( 'x0', x0 )
+        print( 'xK', xK )
 
         print( "Augmented Lagrangian couldn't find solution...")
 

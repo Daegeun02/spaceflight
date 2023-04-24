@@ -1,6 +1,7 @@
 ## Levenberg-Marquardt Algorithm
 from numpy import eye 
 from numpy import zeros_like
+from numpy import round
 
 from numpy.linalg import norm, inv, cond, eig
 
@@ -16,7 +17,7 @@ class LevenbergMarquardt:
         self.itr = itr
 
 
-    def solve(self, func, jacb, x0, lam=-1):
+    def solve(self, func, jacb, x0, lam=-1, force_return=False):
         '''
         root = levenbergMarquardt( 
             func, jacb, x0, args
@@ -37,50 +38,51 @@ class LevenbergMarquardt:
         tol = self.tol
         itr = self.itr
 
-        _xK = x0
+        xK = x0
         uxK = zeros_like( x0 )
-        _f = func( _xK )        ## object function
-        pf = zeros_like( _f )   ## previous object
+        fK = func( xK )         ## object function
+        fP = zeros_like( fK )   ## previous object
 
         ## initialize lambda
-        dim = len( _f )
+        dim = len( fK )
         lam = lam * eye( dim )
 
-        for _ in range( 500 ):
-            Df = jacb( _xK )
+        for _ in range( itr ):
+            Df = jacb( xK )
             ## 1. check optimality condition
-            opt_cond = Df.T @ _f
-
-            # print( Df[2:4,:] )
-            # print( Df.shape )
+            opt_cond = Df.T @ fK
 
             if ( norm( opt_cond ) < tol ):
-                return _xK
-            # print( norm ( opt_cond ) )
+                return xK
 
             ## 2. update xK
             dx = inv( Df.T @ Df + lam ) @ opt_cond
 
-            # print( cond( Df.T @ Df + lam ) )
-            # print( eig( Df.T @ Df + lam )[0] )
+            # print( 'cond N', cond( Df.T @ Df + lam ), '' )
+            # print( 'eigenvalue\n', eig( Df.T @ Df + lam )[0], '' )
+            # print( 'lamdba', lam[0,0] )
 
-            uxK[:] = _xK - dx
+            uxK[:] = xK - dx
 
             ## remember previous objects
-            pf[:] = _f
+            fP[:] = fK
 
             ## re evaluate objects
-            _f = func( uxK )
+            fK[:] = func( uxK )
 
             ## 3. check tentative iterate
-            if ( norm( _f ) < norm( pf ) ):
+            if ( norm( fK ) < norm( fP ) ):
                 ## update xK
-                _xK[:] = uxK
+                xK[:] = uxK
                 lam *= 0.8
             else:
                 ## do not update xK
-                _f[:] = pf
-                lam *= 2.0
+                fK[:] = fP
+                lam *= 1.2
+
+        if ( force_return == True ):
+            return xK
 
         print( opt_cond )
+        print( lam[0,0] )
         print('Levenberg-Marquardt fail to find root of given function')
