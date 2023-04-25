@@ -16,9 +16,9 @@ from numpy import deg2rad
 
 
 
-t_tof = 8000
-t_chs = 1000
-t_trg = 6000
+t_tof = 20000
+t_chs = 2000
+t_trg = 8000
 
 O_chs = {
     "a": 7000,
