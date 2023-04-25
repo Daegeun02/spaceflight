@@ -3,9 +3,7 @@ from optimization import levenbergMarquardt
 
 from numpy import sqrt, cos, sin
 from numpy import pi
-from numpy import zeros
-
-from numpy.random import rand
+from numpy import zeros, array
 
 
 
@@ -50,16 +48,20 @@ class LambertProblem:
             "q": q
         }
 
+        print( T, q )
+
         f = zeros(2)
         J = zeros((2,2))
 
-        x0 = zeros(2) + pi
+        x0 = array([ pi, 0 ])
 
         func = LP_func( args, f ) 
         jacb = LP_jacb( args, J )
 
         ## solve with alpha, beta by levenberg-marquardt algorithm
         xS = levenbergMarquardt( func, jacb, x0 )
+
+        print( 'xS', xS )
 
         a = s / ( 1 - cos( xS[0] ) )
 

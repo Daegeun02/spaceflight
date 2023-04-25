@@ -39,7 +39,9 @@ def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
     '''
     ## direction of angular momentum vector
     H = cross( r_chs_0_ECI, r_trg_t_ECI )
-    h = H / norm( H )
+    h =  H / norm( H )
+
+    print( 'h', h )
 
     ## define orbital plane
     o = arctan2(          h[0], h[1] ) * ( -1 )
@@ -58,6 +60,14 @@ def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
     N_trg_ORP = arctan2( r_trg_t_ORP[1], r_trg_t_ORP[0] )
     theta     = N_trg_ORP - N_chs_ORP
 
+    # print( 'r_chs_0_ORP', r_chs_0_ORP )
+    # print( 'r_trg_t_ORP', r_trg_t_ORP )
+
+    # print( 'N_trg_ORP', N_trg_ORP )
+    # print( 'N_chs_ORP', N_chs_ORP )
+
+    # print( 'theta', theta )
+
     ## solve Lambert Problem so calculate semimajor axis
     LP = LambertProblem( )
     a  = LP.solve( r1, r2, 0, t_tof, theta, mu )
@@ -72,6 +82,10 @@ def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
         'w': 0,
         'T': 0
     }
+
+    period = 2 * pi * sqrt( ( a**3 ) / mu )
+    print( 'period', period )
+
     ## recalculate orbital element
     get_elem_by_foci( F1, O_orp )
     ## ORP to ECI
@@ -85,6 +99,7 @@ def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
     )
 
     print( t_TOF - t_tof )
+    print( t_tof - t_TOF )
 
     ## entry burn
     Dv0 = impulse_ctrl( r_chs_0_ECI, v_chs_0_ECI, O_orp, mu )
