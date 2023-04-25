@@ -3,7 +3,7 @@ from numpy import eye
 from numpy import zeros_like
 from numpy import round
 
-from numpy.linalg import norm, inv, cond, eig
+from numpy.linalg import norm, inv
 
 
 
