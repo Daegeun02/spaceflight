@@ -48,8 +48,6 @@ class LambertProblem:
             "q": q
         }
 
-        print( T, q )
-
         f = zeros(2)
         J = zeros((2,2))
 
@@ -60,8 +58,6 @@ class LambertProblem:
 
         ## solve with alpha, beta by levenberg-marquardt algorithm
         xS = levenbergMarquardt( func, jacb, x0 )
-
-        print( 'xS', xS )
 
         a = s / ( 1 - cos( xS[0] ) )
 
