@@ -35,12 +35,23 @@ def jacb( t ):
     
     return _jacb
 
+
 _func = func( 1 )
 _jacb = jacb( 1 )
 
 
 x0 = zeros( 2 )
 
-xS = levenbergMarquardt( _func, _jacb, x0 )
+from time import process_time
+
+t1 = process_time()
+
+for i in range( 100 ):
+
+    xS = levenbergMarquardt( _func, _jacb, x0 )
+
+t2 = process_time()
 
 print( xS )
+
+print( t2 - t1 )
