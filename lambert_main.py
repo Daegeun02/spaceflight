@@ -1,6 +1,7 @@
 from trajectory import elliptic_orbit
 
 from lambert import LP_solver
+from lambert import LP_solver_without
 
 from two_body_problem import estimate
 
@@ -16,9 +17,9 @@ from numpy import deg2rad
 
 
 
-t_tof = 20000
-t_chs = 2000
-t_trg = 8000
+t_tof = 4000
+t_chs = 1000
+t_trg = 5000
 
 O_chs = {
     "a": 7000,
@@ -30,7 +31,7 @@ O_chs = {
 }
 
 O_trg = {
-    "a": 20000,
+    "a": 10000,
     "o": deg2rad( 0 ),
     "i": deg2rad( 30 ),
     "w": deg2rad( 30 ),
@@ -41,12 +42,11 @@ O_trg = {
 
 if __name__ == "__main__":
 
+    ## estimate chaser's position and velocity
     r_chs_0_ECI, v_chs_0_ECI = estimate( O_chs, MU, t_chs )
-
+    ## estimate target's initial position and velocity
     r_trg_0_ECI, v_trg_0_ECI = estimate( O_trg, MU, t_trg )
-
-    r_trg_T_ECI, v_trg_T_ECI = estimate( O_trg, MU, t_trg+t_tof )
-
+    ## estimate target's final position and velocity
     r_trg_t_ECI, v_trg_t_ECI = step01( 
         r_trg_0_ECI=r_trg_0_ECI,
         v_trg_0_ECI=v_trg_0_ECI,
@@ -55,18 +55,27 @@ if __name__ == "__main__":
         mu=MU
     )
 
-    O_orp, Dv0, Dv1, F1, F2 = LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
+    ## solve Lambert Problem
+    O_orp, Dv0, Dv1, F = LP_solver_without( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
+    print( 'result of without', Dv0, Dv1, F )
+    O_orp, Dv0, Dv1, F = LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
+    print( 'result of with   ', Dv0, Dv1, F )
 
     impulse = {
         0    : Dv0,
         t_tof: Dv1
     }
-
+    ## simulate chaser's original orbit
     pos_chs  , vel_chs   = elliptic_orbit( O_chs, rev=1 )
+    ## simulate chaser's transfer orbit
     pos_orp  , vel_orp   = elliptic_orbit( O_orp, r_chs_0_ECI, v_chs_0_ECI, rev=1, impulse=impulse)
+    ## simulate chaser's transfer orbit
     pos_orp_o, vel_orp_o = elliptic_orbit( O_orp, r_chs_0_ECI, rev=1 )
+    ## simulate target's orbit while doing transfer
     pos_trg  , vel_trg   = elliptic_orbit( O_trg, rev=1 )
 
+    ## plot result
+    ## modify legend freely
     fig = plt.figure( figsize=( 8,8 ) )
     ax  = plt.axes( projection='3d' )
 
@@ -75,21 +84,14 @@ if __name__ == "__main__":
         0,
         0,
         label=' earth ',
-        s=500
+        s=100
     )
 
     ax.scatter(
-        F1[0],
-        F1[1],
-        F1[2],
+        F[0],
+        F[1],
+        F[2],
         label=' focus 1 '
-    )
-
-    ax.scatter(
-        F2[0],
-        F2[1],
-        F2[2],
-        label=' focus 2 '
     )
 
     ax.plot3D(
@@ -122,7 +124,7 @@ if __name__ == "__main__":
         pos_orp[t_tof,1],
         pos_orp[t_tof,2],
         color='g',
-        s=50
+        s=30
     )
 
     ax.plot3D(
