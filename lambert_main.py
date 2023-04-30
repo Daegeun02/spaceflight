@@ -5,7 +5,7 @@ from lambert import LP_solver_without
 
 from two_body_problem import estimate
 
-from transfer import step01
+from transfer import UF_FG_S
 
 from geometry import MU
 
@@ -47,19 +47,13 @@ if __name__ == "__main__":
     ## estimate target's initial position and velocity
     r_trg_0_ECI, v_trg_0_ECI = estimate( O_trg, MU, t_trg )
     ## estimate target's final position and velocity
-    r_trg_t_ECI, v_trg_t_ECI = step01( 
-        r_trg_0_ECI=r_trg_0_ECI,
-        v_trg_0_ECI=v_trg_0_ECI,
-        O_trg=O_trg,
-        t_tof=t_tof,
-        mu=MU
-    )
+    r_trg_t_ECI, v_trg_t_ECI = UF_FG_S( r_trg_0_ECI, v_trg_0_ECI, O_trg, t_tof, MU )
+
+    print( r_trg_0_ECI, v_trg_0_ECI )
 
     ## solve Lambert Problem
     O_orp, Dv0, Dv1, F = LP_solver_without( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
-    print( 'result of without', Dv0, Dv1, F )
     O_orp, Dv0, Dv1, F = LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
-    print( 'result of with   ', Dv0, Dv1, F )
 
     impulse = {
         0    : Dv0,

@@ -6,7 +6,7 @@ from optimization import newtonRaphson
 
 from .universal_form import UF_func, UF_grad
 
-from .step01 import step01
+from .uf_state import UF_FG_S
 
 from geometry import MU
 
@@ -21,7 +21,7 @@ def initial_guess_with_LP( O_chs, O_trg, t_chs, t_trg, t_tof ):
 
     r_trg_0_ECI, v_trg_0_ECI = estimate( O_trg, MU, t_trg )
 
-    r_trg_t_ECI, v_trg_t_ECI = step01( 
+    r_trg_t_ECI, v_trg_t_ECI = UF_FG_S( 
         r_trg_0_ECI=r_trg_0_ECI,
         v_trg_0_ECI=v_trg_0_ECI,
         O_trg=O_trg,

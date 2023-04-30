@@ -1,4 +1,4 @@
-from .newton_raphson import NewtonRaphson
+from .jax_newton_raphson import NewtonRaphson
 
 
 

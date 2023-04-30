@@ -1,8 +1,8 @@
 ## Levenberg-Marquardt Algorithm
-from numpy import eye 
-from numpy import zeros_like
+from jax.numpy import eye 
+from jax.numpy import zeros_like
 
-from numpy.linalg import norm, inv
+from jax.numpy.linalg import norm, inv
 
 
 

@@ -77,7 +77,6 @@ def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
     O_orp_F2 = dict( O_orp )
 
     period = 2 * pi * sqrt( ( a**3 ) / mu )
-    print( 'period', period )
 
     ## recalculate orbital element
     get_elem_by_foci( F1, O_orp_F1 )
@@ -147,7 +146,6 @@ def LP_solver_without( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof
     }
 
     period = 2 * pi * sqrt( ( a**3 ) / mu )
-    print( 'period', period )
 
     R1 = get_ECI2PQW_from_foci( F1, h )
     R2 = get_ECI2PQW_from_foci( F2, h )
