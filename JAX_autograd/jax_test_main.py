@@ -21,45 +21,58 @@ EARTHMASS = 5.9742e24
 
 MU = GRAVCONST * EARTHMASS / ( 1000 ** 3 )
 
-r0 = array( [-12944.83921337, -6562.56493754, -3788.89863326] )
-v0 = array( [1.86069651, -2.71514808, -1.56759148] )
+r_chs_0_ECI = array( [-1449.26847138, 6569.08693194, 0.        ] )
+v_chs_0_ECI = array( [-7.78632738, -0.97724683, 0.        ] )
+r_trg_0_ECI = array( [-12944.83921337, -6562.56493754, -3788.89863326] )
+v_trg_0_ECI = array( [1.86069651, -2.71514808, -1.56759148] )
+
 mu = MU
 a  = 10000.0
-t  = 3000.0
+t  = 4000.0
 
 
-
-if __name__ == "__main__":
+def analytic_backward( configs, t ):
 
     configs = {
-        "r0": r0,
-        "v0": v0,
+        "r_chs_0_ECI": r_chs_0_ECI,
+        "v_chs_0_ECI": v_chs_0_ECI,
+        "r_trg_0_ECI": r_trg_0_ECI,
+        "v_trg_0_ECI": v_trg_0_ECI,
+
         "mu": mu,
         "a" : a,
         "t" : t
     }
 
-    _UF_func = UF_func( configs )
-    _UF_grad = UF_back( configs )
+    trg_configs = {
+        "r0": r_trg_0_ECI,
+        "v0": v_trg_0_ECI,
+        "mu": mu,
+        "a" : a,
+        "t" : t
+    }
 
-    print( _UF_func( 10 ) )
+    r0 = r_trg_0_ECI
+    v0 = v_trg_0_ECI
+
+    _UF_func = UF_func( trg_configs )
+    _UF_grad = UF_back( trg_configs )
 
     x = newtonRaphson( _UF_func, 0.0 ) 
-
-    print( x )
-
-    print( _UF_func( x ) )
-    print( _UF_grad( t ) )
 
     r = 1
     r += ( dot( r0, v0 ) / sqrt( mu * a ) ) * sin( x / sqrt( a ) )
     r += ( ( norm( r0 ) / a ) - 1 ) * cos( x / sqrt( a ) )
     r *= a 
 
+
+
+if __name__ == "__main__":
+
     print( 'xdot', sqrt( mu ) / r )
 
-    _FG_func = FG_expr( r0, v0, configs )
-    _FG_jacb = FG_back( r0, v0, configs )
+    _FG_func = FG_expr( configs )
+    _FG_jacb = FG_back( configs )
 
     rv   = _FG_func( x, t )
     prp_ = np.array( _FG_jacb( x, t ) ).T.reshape(-1,2)

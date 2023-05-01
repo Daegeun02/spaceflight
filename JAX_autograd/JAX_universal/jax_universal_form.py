@@ -53,7 +53,7 @@ def UF_back( configs ):
     return jacobian( solution )
 
 
-def FG_expr( r0, v0, configs ):
+def FG_expr( configs ):
 
     r0 = configs["r0"]
     v0 = configs["v0"]
@@ -87,7 +87,7 @@ def FG_expr( r0, v0, configs ):
     return _func
 
 
-def FG_back( r0, v0, configs ):
+def FG_back( configs ):
 
     r0 = configs["r0"]
     v0 = configs["v0"]

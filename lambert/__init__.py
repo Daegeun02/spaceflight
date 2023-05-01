@@ -116,6 +116,8 @@ def LP_solver_without( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof
     H = cross( r_chs_0_ECI, r_trg_t_ECI )
     h =  H / norm( H )
 
+    print( 'h', h )
+
     ## distance from focus
     r1 = norm( r_chs_0_ECI )
     r2 = norm( r_trg_t_ECI )

@@ -49,6 +49,7 @@ if __name__ == "__main__":
     ## estimate target's final position and velocity
     r_trg_t_ECI, v_trg_t_ECI = UF_FG_S( r_trg_0_ECI, v_trg_0_ECI, O_trg, t_tof, MU )
 
+    print( r_chs_0_ECI, v_chs_0_ECI )
     print( r_trg_0_ECI, v_trg_0_ECI )
 
     ## solve Lambert Problem

@@ -1,3 +1,4 @@
+from .before_lambert import AM_func
 
 
 

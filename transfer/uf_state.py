@@ -1,7 +1,7 @@
 from optimization import newtonRaphson
 
 from .universal_form import UF_func, UF_grad
-from .universal_form import f_and_g_expression
+from .universal_form import FG_expr
 
 
 
@@ -23,6 +23,6 @@ def UF_FG_S( r_xxx_0_xxx, v_xxx_0_xxx, O_xxx, t_xxx, mu ):
 
     x = newtonRaphson( func, grad, 0.0 )
 
-    r_xxx_t_xxx, v_xxx_t_xxx = f_and_g_expression( x, r_xxx_0_xxx, v_xxx_0_xxx, configs )
+    r_xxx_t_xxx, v_xxx_t_xxx = FG_expr( x, r_xxx_0_xxx, v_xxx_0_xxx, configs )
 
     return r_xxx_t_xxx, v_xxx_t_xxx

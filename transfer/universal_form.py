@@ -68,7 +68,7 @@ def UF_grad( configs ):
     return _grad
 
 
-def f_and_g_expression( x, r0, v0, configs ):
+def FG_expr( x, r0, v0, configs ):
 
     m = configs["mu"]
     a = configs["a"]
