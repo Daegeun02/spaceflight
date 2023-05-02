@@ -2,16 +2,21 @@ from JAX_universal import UF_func
 from JAX_universal import FG_expr
 
 from JAX_lambert import AM_func
+from JAX_lambert import LambertProblem
 
 from JAX_optimizer import newtonRaphson
 
 from jax import jacfwd
 
+from jax.numpy import array, zeros
 from jax.numpy import dot
-from jax.numpy import sqrt
+from jax.numpy import sqrt, pi
 from jax.numpy import cos, arccos
+from jax.numpy import sin
 
 from jax.numpy.linalg import norm
+
+from jaxopt import LevenbergMarquardt
 
 
 
@@ -63,21 +68,58 @@ def forward( configs ):
 
         theta = arccos( dot( r_chs_0_ECI, r_trg_t_ECI ) / ( r1 * r2 ) )
 
-        c = r1**2 + r2**2 - 2 * dot( r_chs_0_ECI, r_trg_t_ECI )
+        c = sqrt( r1**2 + r2**2 - 2 * dot( r_chs_0_ECI, r_trg_t_ECI ) )
         s = (0.5) * ( r1 + r2 + c )
 
         q = ( sqrt( r1 * r2 ) / s ) * cos( theta/2 )
 
         T = sqrt( ( 8 * mu ) / ( s**3 ) ) * t
 
-        return h
+        return s, q, T
    
     return _func
 
 
+def LP_back( s, q, T ):
+
+    x0 = array([ pi, 0.0 ])
+    
+    LM = LevenbergMarquardt( LP_func )
+    xS = LM.run( x0, q, T ).params
+
+    _a = s / ( 1 - cos( xS[0] ) )
+
+    return _a
+        
+
+def LP_func( s, q, T ):
+
+    def _func( x ):
+        a, b = x
+        out  = zeros(2)
+
+        out = out.at[0].set(
+            sin( b / 2 ) - q * sin( a / 2 ),
+        )
+        out = out.at[1].set(
+            T * ( sin( a / 2 ) ** 3 ) - ( a - b - sin( a ) + sin( b ) )
+        )
+
+        return out
+
+    x0 = array([ pi, 0.0 ])
+    
+    LM = LevenbergMarquardt( _func )
+    xS = LM.run( x0 ).params
+
+    _a = s / ( 1 - cos( xS[0] ) )
+
+    return _a
+
+
+
 if __name__ == "__main__":
     print( '<<< JAX >>>' )
-    from numpy import array
 
     GRAVCONST = 6.674e-11
     EARTHMASS = 5.9742e24
@@ -90,7 +132,7 @@ if __name__ == "__main__":
 
     mu = MU
     a  = 10000.0
-    t  = 4000.0
+    t  = 3900.0
 
     configs = {
         "r_chs_0_ECI": r_chs_0_ECI,
@@ -105,10 +147,15 @@ if __name__ == "__main__":
 
     _func = forward( configs )
 
-    T = _func( t )
+    s, q, T = _func( t )
 
-    print( 'T    =>', T )
+    _a = LP_func( s, q, T )
+
+    print( 'T    =>', s, q, T )
+    print( 'a    => ', _a )
 
     _grad = jacfwd( _func )
+    print( 'Tdot =>', array( _grad( t ) ) )
 
-    print( 'Tdot =>', _grad( t ) )
+    # _grad = jacfwd( LP_back )
+    # print( 'adot => ', _grad( s, q, T ) )

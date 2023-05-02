@@ -1,5 +1,7 @@
 from .before_lambert import AM_func
 
+from .lambert import LambertProblem
+
 
 
 class Steps:

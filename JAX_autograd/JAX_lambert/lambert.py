@@ -1,9 +1,9 @@
 ## LAMBERT PROBLEM
-from JAX_optimizer import levenbergMarquardt
-
 from jax.numpy import sqrt, cos, sin
 from jax.numpy import pi
 from jax.numpy import zeros, array
+
+from jaxopt import LevenbergMarquardt
 
 
 
@@ -48,23 +48,20 @@ class LambertProblem:
             "q": q
         }
 
-        f = zeros(2)
-        J = zeros((2,2))
-
         x0 = array([ pi, 0 ])
 
-        func = LP_func( args, f ) 
-        jacb = LP_jacb( args, J )
+        _func = LP_func( args ) 
 
         ## solve with alpha, beta by levenberg-marquardt algorithm
-        xS = levenbergMarquardt( func, jacb, x0 )
+        LM = LevenbergMarquardt( _func )
+        xS = LM.run( x0 )
 
         a = s / ( 1 - cos( xS[0] ) )
 
         return a
 
 
-def LP_func( args, out ):
+def LP_func( args ):
 
     T = args["T"]
     q = args["q"]
@@ -73,34 +70,11 @@ def LP_func( args, out ):
 
         a, b = x
 
-        out[0] = sin( b / 2 ) - q * sin( a / 2 )
-        out[1] = T * ( sin( a / 2 ) ** 3 ) - ( a - b - sin( a ) + sin( b ) )
+        out = array([
+            sin( b / 2 ) - q * sin( a / 2 ),
+            T * ( sin( a / 2 ) ** 3 ) - ( a - b - sin( a ) + sin( b ) )
+        ])
 
         return out
 
     return _func
-
-
-def LP_jacb( args, out ):
-
-    T = args["T"]
-    q = args["q"]
-
-    def _jacb( x ):
-
-        a, b = x
-
-        ca2 = cos( a / 2 )
-        sa2 = sin( a / 2 )
-
-        out[0,0] = q * ca2 * (-0.5)
-
-        out[1,0] = T * ( sa2 ** 2 ) * ca2 * (1.5) - 1 + cos( a )
-
-        out[0,1] = cos( b / 2 ) * (0.5)
-
-        out[1,1] = 1 - cos( b )
-
-        return out
-
-    return _jacb
