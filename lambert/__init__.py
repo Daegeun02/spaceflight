@@ -6,6 +6,7 @@ from .lambert import LambertProblem
 from .focus_calculus import get_foci_by_a, get_elem_by_foci
 from .focus_calculus import get_foci_by_a_without
 from .focus_calculus import get_ECI2PQW_from_foci
+from .focus_calculus import FA_func, FA_jacb
 
 from .impulse_control import impulse_ctrl
 from .impulse_control import impulse_ctrl_without
@@ -115,8 +116,6 @@ def LP_solver_without( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof
     ## direction of angular momentum vector
     H = cross( r_chs_0_ECI, r_trg_t_ECI )
     h =  H / norm( H )
-
-    print( 'h', h )
 
     ## distance from focus
     r1 = norm( r_chs_0_ECI )

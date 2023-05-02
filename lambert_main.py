@@ -8,21 +8,29 @@ from two_body_problem import estimate
 from transfer import UF_FG_S
 
 from geometry import MU
+from geometry import EARTHRADS as Re
 
 import matplotlib.pyplot as plt
 
 from mpl_toolkits import mplot3d
 
+import pandas as pd
+
 from numpy import deg2rad
+from numpy import array
+from numpy import linspace
+from numpy import cos, sin
+
+from itertools import product
 
 
 
-t_tof = 4000
+t_tof = 7900
 t_chs = 1000
 t_trg = 5000
 
 O_chs = {
-    "a": 7000,
+    "a": 10000,
     "o": deg2rad( 30 ),
     "i": deg2rad( 0 ),
     "w": deg2rad( 0 ),
@@ -31,13 +39,33 @@ O_chs = {
 }
 
 O_trg = {
-    "a": 10000,
+    "a": 15000,
     "o": deg2rad( 0 ),
     "i": deg2rad( 30 ),
     "w": deg2rad( 30 ),
     "e": 0.5,
     "T": 0
 }
+
+
+def draw_earth():       
+    # angles
+    polars = linspace(0, 180, 19)
+    azimuths = linspace(0, 360, 37)
+
+    # points
+    df = pd.DataFrame(product(polars, azimuths), columns=["azi", "polar"])
+    df["x"] = df.apply(lambda x: cos(deg2rad(x[1]))*sin(deg2rad(x[0])), axis=1)
+    df["y"] = df.apply(lambda x: sin(deg2rad(x[1]))*sin(deg2rad(x[0])), axis=1)
+    df["z"] = df.apply(lambda x: cos(deg2rad(x[0])), axis=1)
+
+    ax.plot_surface(df["x"].values.reshape((19, 37))*Re, 
+                    df["y"].values.reshape((19, 37))*Re, 
+                    df["z"].values.reshape((19, 37))*Re, 
+                    ec="w", lw=0.2, ls=":",
+                    cmap="viridis",
+                    alpha=0.3)
+    ax.set_box_aspect((1, 1, 1))
 
 
 if __name__ == "__main__":
@@ -49,12 +77,29 @@ if __name__ == "__main__":
     ## estimate target's final position and velocity
     r_trg_t_ECI, v_trg_t_ECI = UF_FG_S( r_trg_0_ECI, v_trg_0_ECI, O_trg, t_tof, MU )
 
-    print( r_chs_0_ECI, v_chs_0_ECI )
-    print( r_trg_0_ECI, v_trg_0_ECI )
+    # print( r_chs_0_ECI, v_chs_0_ECI )
+    # print( r_trg_0_ECI, v_trg_0_ECI )
+
+    # _chs_0_ECI = array([5000e3, 0, 5042e3, 0, 7492.18085, 0])
+    # _trg_0_ECI = array([2134089.51, 4094615.131, 5655178.001, -4451.749557, -3952.959997, 4930.183112])
+    # _chs_t_ECI = array([4.36602877e6, 2.43675866e6, 5.04200000e6, 3.17506572e2, 1.77206090e2, 0.00000000e0])
+    # _trg_t_ECI = array([4.36602877e6, 2.43675866e6, 5.04200000e6, 3.17506572e2, 1.77206090e2, 0.00000000e0])
+
+    # t_tof = 7000
+
+    # r_chs_0_ECI = _chs_0_ECI[0:3] / 1000
+    # v_chs_0_ECI = _chs_0_ECI[3:6] / 1000
+
+    # r_trg_t_ECI = _trg_t_ECI[0:3] / 1000
+    # v_trg_t_ECI = _trg_t_ECI[3:6] / 1000
 
     ## solve Lambert Problem
     O_orp, Dv0, Dv1, F = LP_solver_without( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
-    O_orp, Dv0, Dv1, F = LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
+
+    O_orp, _Dv0, _Dv1, F = LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
+
+    print( O_orp )
+    print( Dv0, Dv1 )
 
     impulse = {
         0    : Dv0,
@@ -74,13 +119,14 @@ if __name__ == "__main__":
     fig = plt.figure( figsize=( 8,8 ) )
     ax  = plt.axes( projection='3d' )
 
-    ax.scatter(
-        0,
-        0,
-        0,
-        label=' earth ',
-        s=100
-    )
+    # ax.scatter(
+    #     0,
+    #     0,
+    #     0,
+    #     label=' earth ',
+    #     s=100
+    # )
+    draw_earth()
 
     ax.scatter(
         F[0],
@@ -123,9 +169,9 @@ if __name__ == "__main__":
     )
 
     ax.plot3D(
-        pos_orp_o[:,0],
-        pos_orp_o[:,1],
-        pos_orp_o[:,2],
+        pos_orp_o[:t_tof,0],
+        pos_orp_o[:t_tof,1],
+        pos_orp_o[:t_tof,2],
         label=' transfer orbit ',
         color='g',
         alpha=0.3

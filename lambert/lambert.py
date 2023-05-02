@@ -21,7 +21,8 @@ class LambertProblem:
     '''
 
     def __init__(self):
-        pass
+
+        self.xS = zeros(2)
 
 
     def solve(self, r1, r2, t1, t2, theta, mu):
@@ -60,6 +61,8 @@ class LambertProblem:
         xS = levenbergMarquardt( func, jacb, x0 )
 
         a = s / ( 1 - cos( xS[0] ) )
+
+        self.xS[:] = xS
 
         return a
 
