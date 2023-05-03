@@ -11,7 +11,7 @@ class NewtonRaphson:
         self.itr = itr
 
 
-    def solve(self, func, grad, x0):
+    def solve(self, func, grad, x0, force_return=False):
         '''
         root = newtonRaphson(
             func, grad, x0, args
@@ -48,5 +48,8 @@ class NewtonRaphson:
             dx = f / g
 
             xK -= dx
+
+        if force_return:
+            return xK
 
         print('NewtonRaphson fail to find root of given function')

@@ -10,8 +10,8 @@ from transfer import FG_expr
 from geometry import MU
 
 from numpy import array, zeros
-from numpy import dot
-from numpy import sqrt
+from numpy import dot, eye
+from numpy import sqrt, pi
 from numpy import cos, arccos
 from numpy import sin, arcsin
 
@@ -29,8 +29,9 @@ def backward( configs ):
     v_trg_0_ECI = configs["v_trg_0_ECI"]
 
     mu = configs["mu"]
-    a  = configs["a"]
     t  = configs["t"]
+
+    a_trg  = configs["a_trg"]
 
     r0 = r_trg_0_ECI
     v0 = v_trg_0_ECI
@@ -41,7 +42,7 @@ def backward( configs ):
             "r0": r_trg_0_ECI,
             "v0": v_trg_0_ECI,
             "mu": mu,
-            "a" : a,
+            "a" : a_trg,
             "t" : t
         }
 
@@ -154,7 +155,7 @@ def backward( configs ):
         _r0 = norm( r_chs_0_ECI - r_trg_t_ECI )
         _r1 = 2 * _a - r1
         _r2 = 2 * _a - r2
-
+        
         args = {
             "_r": _r0,
             "r1": _r1,
@@ -167,7 +168,8 @@ def backward( configs ):
         func = FA_func( args, f )
         jacb = FA_jacb( args, J )
 
-        L = levenbergMarquardt( func, jacb, rand(2) )
+        x0 = array([pi/4, pi/4])
+        L = levenbergMarquardt( func, jacb, x0 )
         l = _r1 * sin( L[0] )
 
         g    = ( _r1 / _r2 ) * sin( L[0] )
@@ -183,10 +185,41 @@ def backward( configs ):
         _N *= 2 * _adot - ( dot( r_trg_t_ECI, v_trg_t_ECI ) / _r2 )
         _N += cdot
 
-        ldot = _N / _D
+        ldot = 0
+        ldot += r1 * cos( L[0] ) * ( _N / _D )
+        ldot += 2 * _adot * sin( L[0] )
         ## l backward END ##
 
-        return A, _a, l, Adot, _adot, ldot
+        ## d backward BEGIN ##
+        d = ( r_trg_t_ECI - r_chs_0_ECI ) / c
+
+        ddot = 0
+        ddot += dot( ( eye(3) / c ), rdot )
+        ddot -= ( d / c ) * cdot
+        ## d backward END ##
+
+        ## D backward BEGIN ##
+        h_SKM = array([
+            [0, -h[2], h[1]],
+            [h[2], 0, -h[0]],
+            [-h[1], h[0], 0]
+        ])
+        d_SKM = array([
+            [0, -d[2], d[1]],
+            [d[2], 0, -d[0]],
+            [-d[1], d[0], 0]
+        ])
+        D = h_SKM @ d
+
+        Ddot = h_SKM @ ddot - d_SKM @ hdot
+        ## D backward END ##
+
+        ## O backward BEGIN ##
+
+        ## O backward END ##
+
+        return x, A, l, xdot, Adot, ldot 
+        # return A, _a, l, d, D, Adot, _adot, ldot, ddot, Ddot
 
     return _func
 
@@ -194,14 +227,16 @@ def backward( configs ):
 if __name__ == "__main__":
     print( '<<< NUMPY >>>' )
 
-    r_chs_0_ECI = array( [-1449.26847138, 6569.08693194, 0.        ] )
-    v_chs_0_ECI = array( [-7.78632738, -0.97724683, 0.        ] )
-    r_trg_0_ECI = array( [-12944.83921337, -6562.56493754, -3788.89863326] )
-    v_trg_0_ECI = array( [1.86069651, -2.71514808, -1.56759148] )
+    r_chs_0_ECI = array( [2594.76851273, 8860.1442633,     0.        ] )
+    v_chs_0_ECI = array( [-6.40773121,  2.33323034,  0.        ] )
+    r_trg_0_ECI = array( [-18966.02307806,   1460.66653646,    843.31621802] )
+    v_trg_0_ECI = array( [-2.01566097, -2.90294796, -1.67601778] )
 
     mu = MU
-    a  = 10000.0
-    t  = 3900.0
+    t  = 9113.471
+
+    a_chs = 10000.0
+    a_trg = 15000.0
 
     configs = {
         "r_chs_0_ECI": r_chs_0_ECI,
@@ -210,13 +245,15 @@ if __name__ == "__main__":
         "v_trg_0_ECI": v_trg_0_ECI,
 
         "mu": mu,
-        "a" : a,
-        "t" : t
+        "t" : t,
+        
+        "a_chs": a_chs,
+        "a_trg": a_trg
     }
 
     _grad = backward( configs )
 
-    A, a, l, Adot, adot, ldot = _grad( t )
+    x, A, l, xdot, Adot, ldot = _grad( t )
 
-    print( 'val =>', A, a, l )
-    print( 'dot =>', Adot, adot, ldot )
+    print( 'val =>', x, A, l )
+    print( 'dot =>', xdot, Adot, ldot )

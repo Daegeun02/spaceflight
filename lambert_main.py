@@ -25,7 +25,7 @@ from itertools import product
 
 
 
-t_tof = 7900
+t_tof = 12762.283
 t_chs = 1000
 t_trg = 5000
 
@@ -233,4 +233,4 @@ if __name__ == "__main__":
 
     ax.legend()
 
-    plt.show()
+    # plt.show()

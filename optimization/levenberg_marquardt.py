@@ -2,7 +2,7 @@
 from numpy import eye 
 from numpy import zeros_like
 
-from numpy.linalg import norm, inv
+from numpy.linalg import norm, inv, eig
 
 
 
@@ -57,10 +57,6 @@ class LevenbergMarquardt:
             ## 2. update xK
             dx = inv( Df.T @ Df + lam ) @ opt_cond
 
-            # print( 'cond N', cond( Df.T @ Df + lam ), '' )
-            # print( 'eigenvalue\n', eig( Df.T @ Df + lam )[0], '' )
-            # print( 'lamdba', lam[0,0] )
-
             uxK[:] = xK - dx
 
             ## remember previous objects
@@ -79,7 +75,7 @@ class LevenbergMarquardt:
                 fK[:] = fP
                 lam *= 1.2
 
-        if ( force_return == True ):
+        if force_return:
             return xK
 
         print( opt_cond )

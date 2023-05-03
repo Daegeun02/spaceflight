@@ -39,18 +39,30 @@ def UF_func( configs ):
     return _func
 
 
-## pxpt
-def UF_back( configs ):
+def UF_grad( configs ):
 
-    def solution( t ):
+    r0 = configs["r0"]
+    v0 = configs["v0"]
+    m  = configs["mu"]
+    a  = configs["a"]
+    t  = configs["t"]
 
-        configs["t"] = t
+    sqrt_m = sqrt( m )
 
-        _func = UF_func( configs )
+    _r0 = norm( r0 )
 
-        return newtonRaphson( _func, 0.0 )
+    def _grad( x ):
 
-    return jacobian( solution )
+        sqrt_a = sqrt( a )
+
+        out = 0.0
+        out += a * ( 1 - cos( x / sqrt_a ) )
+        out += ( dot( r0, v0 ) / sqrt_m ) * sqrt_a * sin( x / sqrt_a )
+        out += _r0 * cos( x / sqrt_a )
+
+        return out
+
+    return _grad
 
 
 def FG_expr( configs ):

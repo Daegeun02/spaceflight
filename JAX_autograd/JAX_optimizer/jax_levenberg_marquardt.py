@@ -2,7 +2,7 @@
 from jax.numpy import eye 
 from jax.numpy import zeros_like
 
-from jax.numpy.linalg import norm, inv
+from jax.numpy.linalg import norm, inv, eig
 
 
 
@@ -38,9 +38,7 @@ class LevenbergMarquardt:
         itr = self.itr
 
         xK = x0
-        uxK = zeros_like( x0 )
         fK = func( xK )         ## object function
-        fP = zeros_like( fK )   ## previous object
 
         ## initialize lambda
         dim = len( fK )
@@ -51,35 +49,35 @@ class LevenbergMarquardt:
             ## 1. check optimality condition
             opt_cond = Df.T @ fK
 
+            # print( fK )
+
             if ( norm( opt_cond ) < tol ):
                 return xK
 
             ## 2. update xK
             dx = inv( Df.T @ Df + lam ) @ opt_cond
+            # print( dx )
+            # print( '=' * 20 )
 
-            # print( 'cond N', cond( Df.T @ Df + lam ), '' )
-            # print( 'eigenvalue\n', eig( Df.T @ Df + lam )[0], '' )
-            # print( 'lamdba', lam[0,0] )
-
-            uxK[:] = xK - dx
+            uxK = xK - dx
 
             ## remember previous objects
-            fP[:] = fK
+            fP = fK
 
             ## re evaluate objects
-            fK[:] = func( uxK )
+            fK = func( uxK )
 
             ## 3. check tentative iterate
             if ( norm( fK ) < norm( fP ) ):
                 ## update xK
-                xK[:] = uxK
+                xK = uxK
                 lam *= 0.8
             else:
                 ## do not update xK
-                fK[:] = fP
+                fK = fP
                 lam *= 1.2
 
-        if ( force_return == True ):
+        if force_return:
             return xK
 
         print( opt_cond )

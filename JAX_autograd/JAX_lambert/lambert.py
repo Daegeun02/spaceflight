@@ -78,3 +78,40 @@ def LP_func( args ):
         return out
 
     return _func
+
+
+def LP_func( T, q ):
+
+    def _func( x ):
+
+        out = zeros(2)
+
+        a, b = x
+
+        out = out.at[0].set( sin( b / 2 ) - q * sin( a / 2 ) )
+        out = out.at[1].set( T * ( sin( a / 2 ) ** 3 ) - ( a - b - sin( a ) + sin( b ) ) )
+
+        return out
+
+    return _func
+
+
+def LP_jacb( T, q ):
+
+    def _jacb( x ):
+
+        out = zeros((2,2))
+
+        a, b = x
+
+        ca2 = cos( a / 2 )
+        sa2 = sin( a / 2 )
+
+        out = out.at[0,0].set( q * ca2 * (-0.5) )
+        out = out.at[1,0].set( T * ( sa2 ** 2 ) * ca2 * (1.5) - 1 + cos( a ) )
+        out = out.at[0,1].set( cos( b / 2 ) * (0.5) )
+        out = out.at[1,1].set( 1 - cos( b ) )
+
+        return out
+    
+    return _jacb
