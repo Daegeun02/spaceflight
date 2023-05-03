@@ -21,7 +21,7 @@ def UF_FG_S( r_xxx_0_xxx, v_xxx_0_xxx, O_xxx, t_xxx, mu ):
     func = UF_func( configs )
     grad = UF_grad( configs )
 
-    x = newtonRaphson( func, grad, 0.0 )
+    x = newtonRaphson( func, grad, 0.0, force_return=True )
 
     r_xxx_t_xxx, v_xxx_t_xxx = FG_expr( x, r_xxx_0_xxx, v_xxx_0_xxx, configs )
 

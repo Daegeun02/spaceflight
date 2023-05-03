@@ -1,10 +1,10 @@
 from optimization import levenbergMarquardt 
 
 from numpy import arctan2
-from numpy import cos, sin
+from numpy import cos, sin, pi
 from numpy import sqrt
 from numpy import cross
-from numpy import zeros
+from numpy import zeros, array
 
 from numpy.linalg import norm
 
@@ -69,7 +69,8 @@ def get_foci_by_a_without( a, h, r_chs_0_ECI, r_trg_t_ECI ):
     func = FA_func( args, f )
     jacb = FA_jacb( args, J )
 
-    x = levenbergMarquardt( func, jacb, rand(2) )
+    x0 = array( [pi/4, pi/4] )
+    x = levenbergMarquardt( func, jacb, x0, force_return=True )
     l = r1 * sin( x[0] )
 
     D = zeros(3)

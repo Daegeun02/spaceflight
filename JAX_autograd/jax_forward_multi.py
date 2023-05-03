@@ -18,44 +18,55 @@ from jax.numpy.linalg import norm
 
 
 
-def forward( configs ):
+def multi_forward( configs ):
 
-    r_chs_0_ECI = configs["r_chs_0_ECI"]
-    v_chs_0_ECI = configs["v_chs_0_ECI"]
-    r_trg_0_ECI = configs["r_trg_0_ECI"]
-    v_trg_0_ECI = configs["v_trg_0_ECI"]
+    r_chs_x_ECI = configs["r_chs_0_ECI"]
+    v_chs_x_ECI = configs["v_chs_0_ECI"]
+    r_trg_x_ECI = configs["r_trg_0_ECI"]
+    v_trg_x_ECI = configs["v_trg_0_ECI"]
 
     mu = configs["mu"]
-    t  = configs["t"]
 
     a_chs = configs["a_chs"]
     a_trg = configs["a_trg"]
 
-    def _func( t ):
+    def _func( ts ):
+
+        tw, t1 = ts
 
         chs_configs = {
-            "r0": r_chs_0_ECI,
-            "v0": v_chs_0_ECI,
+            "r0": r_chs_x_ECI,
+            "v0": v_chs_x_ECI,
             "mu": mu,
             "a" : a_chs,
-            "t" : t
+            "t" : tw
         }
 
         trg_configs = {
-            "r0": r_trg_0_ECI,
-            "v0": v_trg_0_ECI,
+            "r0": r_trg_x_ECI,
+            "v0": v_trg_x_ECI,
             "mu": mu,
             "a" : a_trg,
-            "t" : t
+            "t" : tw+t1
         }
 
-        _UF_func = UF_func( trg_configs )
-        _UF_grad = UF_grad( trg_configs )
-        _FG_func = FG_expr( trg_configs )
+        _UF_func_chs = UF_func( chs_configs )
+        _UF_grad_chs = UF_grad( chs_configs )
+        _FG_func_chs = FG_expr( chs_configs )
 
-        x = newtonRaphson( _UF_func, _UF_grad, 0.0, force_return=True )
+        x_chs = newtonRaphson( _UF_func_chs, _UF_grad_chs, 0.0, force_return=True )
 
-        _r_v        = _FG_func( x, t )
+        _r_v = _FG_func_chs( x_chs, tw )
+        r_chs_0_ECI = _r_v[0:3]
+        v_chs_0_ECI = _r_v[3:6]
+
+        _UF_func_trg = UF_func( trg_configs )
+        _UF_grad_trg = UF_grad( trg_configs )
+        _FG_func_trg = FG_expr( trg_configs )
+
+        x_trg = newtonRaphson( _UF_func_trg, _UF_grad_trg, 0.0, force_return=True )
+
+        _r_v        = _FG_func_trg( x_trg, tw+t1 )
         r_trg_t_ECI = _r_v[0:3]
         v_trg_t_ECI = _r_v[3:6]
 
@@ -72,7 +83,7 @@ def forward( configs ):
 
         q = ( sqrt( r1 * r2 ) / s ) * cos( theta/2 )
 
-        T = sqrt( ( 8 * mu ) / ( s**3 ) ) * t
+        T = sqrt( ( 8 * mu ) / ( s**3 ) ) * t1
 
         _LP_func = LP_func( T, q )
         _LP_jacb = LP_jacb( T, q )
@@ -149,7 +160,7 @@ def forward( configs ):
         #     0
         # ])
 
-        if ( t < ( period / 2 ) ):
+        if ( t1 < ( period / 2 ) ):
             Dv0_F1 = ( R1.T @ v_chs_0_PQW ) - v_chs_0_ECI
             # Dv1_F1 = ( R1.T @ v_trg_t_PQW ) - v_trg_t_ECI
         else:
@@ -178,7 +189,7 @@ def forward( configs ):
         #     0
         # ])
 
-        if ( t < ( period / 2 ) ):
+        if ( t1 < ( period / 2 ) ):
             Dv0_F2 = ( R2.T @ v_chs_0_PQW ) - v_chs_0_ECI
             # Dv1_F2 = ( R2.T @ v_trg_t_PQW ) - v_trg_t_ECI
         else:
@@ -211,7 +222,8 @@ if __name__ == "__main__":
     v_trg_0_ECI = array( [-2.01566097, -2.90294796, -1.67601778] )
 
     mu = MU
-    t  = 9000.0
+    tw = 0.0
+    t1 = 9000.0
 
     a_chs = 10000.0
     a_trg = 15000.0
@@ -223,18 +235,19 @@ if __name__ == "__main__":
         "v_trg_0_ECI": v_trg_0_ECI,
 
         "mu": mu,
-        "t" : t,
         
         "a_chs": a_chs,
         "a_trg": a_trg
     }
 
-    _func = forward( configs )
+    _func = multi_forward( configs )
 
-    val = _func( t )
+    t0 = array( [ tw, t1 ] )
+
+    val = _func( t0 )
 
     _grad = jacobian( _func )
 
     print( 'val =>', val )
 
-    print( 'dot =>', array( _grad( t ) ) )
+    print( 'dot =>', array( _grad( t0 ) ) )

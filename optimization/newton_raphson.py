@@ -50,6 +50,7 @@ class NewtonRaphson:
             xK -= dx
 
         if force_return:
+            print( f'force returned careful for numerical error => {abs( f )}' )
             return xK
 
         print('NewtonRaphson fail to find root of given function')

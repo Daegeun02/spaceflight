@@ -14,11 +14,14 @@ from numpy import zeros, ndarray
 def elliptic_orbit( OrbitalElement, r_xxx_x_ECI=None, v_xxx_x_ECI=None, dt=1, rev=1, impulse=None ):
 
     a = OrbitalElement["a"]
-    o = OrbitalElement["o"]
-    i = OrbitalElement["i"]
-    w = OrbitalElement["w"]
+    try:
+        o = OrbitalElement["o"]
+        i = OrbitalElement["i"]
+        w = OrbitalElement["w"]
+    except KeyError:
+        R = OrbitalElement["R"]
     e = OrbitalElement["e"]
-    T = OrbitalElement["T"]
+    # T = OrbitalElement["T"]
 
     ## period for a revolution
     period = 2 * pi * sqrt( ( a**3 ) / MU )

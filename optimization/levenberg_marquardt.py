@@ -76,8 +76,9 @@ class LevenbergMarquardt:
                 lam *= 1.2
 
         if force_return:
+            print( f'force returned careful for numerical error => {norm( opt_cond )}' )
             return xK
 
-        print( opt_cond )
-        print( lam[0,0] )
+        print( 'optimal condition =>', opt_cond )
+        print( 'lambda =>', lam[0,0] )
         print('Levenberg-Marquardt fail to find root of given function')

@@ -1,25 +1,22 @@
 ## lambert problem solver
-from coordinate import ECI2ORP
+from transfer import UF_FG_S
 
 from .lambert import LambertProblem
 
-from .focus_calculus import get_foci_by_a, get_elem_by_foci
 from .focus_calculus import get_foci_by_a_without
 from .focus_calculus import get_ECI2PQW_from_foci
-from .focus_calculus import FA_func, FA_jacb
 
-from .impulse_control import impulse_ctrl
 from .impulse_control import impulse_ctrl_without
 
-from numpy import cross, sqrt
-from numpy import arctan2, pi
-from numpy import arccos, dot 
+from numpy import dot, cross
+from numpy import sqrt
+from numpy import arccos, pi
 
 from numpy.linalg import norm
 
 
 
-def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
+def Build_LP_solver( r_chs_x_ECI, v_chs_x_ECI, r_trg_x_ECI, v_trg_x_ECI, mu, O_chs, O_trg ):
     '''
     Calculate transfer orbit from r1 to r2.
 
@@ -38,140 +35,75 @@ def LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
     t2: time when arriving transfer
     theta: the angle between r1 and r2 vector
     '''
-    ## direction of angular momentum vector
-    H = cross( r_chs_0_ECI, r_trg_t_ECI )
-    h =  H / norm( H )
+    def _func( t_tof, tw=0.0 ):
+        ## department
+        r_chs_0_ECI, v_chs_0_ECI = UF_FG_S( r_chs_x_ECI, v_chs_x_ECI, O_chs, tw, mu )
+        ## destination
+        r_trg_t_ECI, v_trg_t_ECI = UF_FG_S( r_trg_x_ECI, v_trg_x_ECI, O_trg, t_tof, mu )
 
-    ## define orbital plane
-    o = arctan2(          h[0], h[1] ) * ( -1 )
-    i = arctan2( norm( h[:2] ), h[2] ) * ( -1 )
+        ## direction of angular momentum vector
+        H = cross( r_chs_0_ECI, r_trg_t_ECI )
+        h =  H / norm( H )
 
-    ## distance from focus
-    r1 = norm( r_chs_0_ECI )
-    r2 = norm( r_trg_t_ECI )
+        ## distance from focus
+        r1 = norm( r_chs_0_ECI )
+        r2 = norm( r_trg_t_ECI )
 
-    R = ECI2ORP( o, i )
-    r_chs_0_ORP = R @ r_chs_0_ECI
-    r_trg_t_ORP = R @ r_trg_t_ECI
+        ## angle between two vectors
+        theta = arccos( dot( r_chs_0_ECI, r_trg_t_ECI ) / ( r1 * r2 ) )
 
-    ## angle between two vectors
-    N_chs_ORP = arctan2( r_chs_0_ORP[1], r_chs_0_ORP[0] )
-    N_trg_ORP = arctan2( r_trg_t_ORP[1], r_trg_t_ORP[0] )
-    theta     = N_trg_ORP - N_chs_ORP
+        ## solve Lambert Problem so calculate semimajor axis
+        LP = LambertProblem( )
+        a  = LP.solve( r1, r2, 0, t_tof, theta, mu )
 
-    ## solve Lambert Problem so calculate semimajor axis
-    LP = LambertProblem( )
-    a  = LP.solve( r1, r2, 0, t_tof, theta, mu )
+        F1, F2 = get_foci_by_a_without( a, h, r_chs_0_ECI, r_trg_t_ECI )
 
-    F1, F2 = get_foci_by_a( a, r_chs_0_ORP, r_trg_t_ORP )
+        ## eccentricity
+        ae = norm( F1 )
+        e1 = ae / ( 2 * a )
 
-    O_orp = {
-        'a': a,
-        'e': 0,
-        'o': o,
-        'i': i,
-        'w': 0,
-        'T': 0
-    }
+        ae = norm( F2 )
+        e2 = ae / ( 2 * a )
 
-    O_orp_F1 = dict( O_orp )
-    O_orp_F2 = dict( O_orp )
+        O_orp_F1 = {
+            'a': a,
+            'e': e1,
+            'R': R1
+        }
+        O_orp_F2 = {
+            'a': a,
+            'e': e2,
+            'R': R2
+        }
 
-    period = 2 * pi * sqrt( ( a**3 ) / mu )
+        period = 2 * pi * sqrt( ( a**3 ) / mu )
 
-    ## recalculate orbital element
-    get_elem_by_foci( F1, O_orp_F1 )
-    get_elem_by_foci( F2, O_orp_F2 )
-    ## ORP to ECI
-    F1 = R.T @ F1
-    F2 = R.T @ F2
+        R1 = get_ECI2PQW_from_foci( F1, h )
+        R2 = get_ECI2PQW_from_foci( F2, h )
 
-    if ( t_tof > ( period / 2 ) ):
-        Dv0_F1 = impulse_ctrl( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, mu, reverse=True )
-        Dv1_F1 = impulse_ctrl( r_trg_t_ECI, v_trg_t_ECI, O_orp_F1, mu, reverse=True )
-    else:
-        Dv0_F1 = impulse_ctrl( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, mu )
-        Dv1_F1 = impulse_ctrl( r_trg_t_ECI, v_trg_t_ECI, O_orp_F1, mu )
+        if ( t_tof > ( period / 2 ) ):
+            Dv0_F1 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, R1, mu, reverse=True )
+            Dv1_F1 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F1, R1, mu, reverse=True )
+        else:
+            Dv0_F1 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, R1, mu )
+            Dv1_F1 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F1, R1, mu )
 
-    if ( t_tof > ( period / 2 ) ):
-        Dv0_F2 = impulse_ctrl( r_chs_0_ECI, v_chs_0_ECI, O_orp_F2, mu, reverse=True )
-        Dv1_F2 = impulse_ctrl( r_trg_t_ECI, v_trg_t_ECI, O_orp_F2, mu, reverse=True )
-    else:
-        Dv0_F2 = impulse_ctrl( r_chs_0_ECI, v_chs_0_ECI, O_orp_F2, mu )
-        Dv1_F2 = impulse_ctrl( r_trg_t_ECI, v_trg_t_ECI, O_orp_F2, mu )
+        if ( t_tof > ( period / 2 ) ):
+            Dv0_F2 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F2, R2, mu, reverse=True )
+            Dv1_F2 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F2, R2, mu, reverse=True )
+        else:
+            Dv0_F2 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F2, R2, mu )
+            Dv1_F2 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F2, R2, mu )
 
-    Dv__F1 = norm( Dv0_F1 ) + norm( Dv1_F1 )
-    Dv__F2 = norm( Dv0_F2 ) + norm( Dv1_F2 )
+        Dv__F1 = norm( Dv0_F1 ) + norm( Dv1_F1 )
+        Dv__F2 = norm( Dv0_F2 ) + norm( Dv1_F2 )
 
-    if ( Dv__F1 < Dv__F2 ):
+        if ( Dv__F1 < Dv__F2 ):
 
-        return O_orp_F1, Dv0_F1, -Dv1_F1, F1
+            return O_orp_F1, Dv0_F1, -Dv1_F1, F1
 
-    else:
+        else:
 
-        return O_orp_F2, Dv0_F2, -Dv1_F2, F2 
+            return O_orp_F2, Dv0_F2, -Dv1_F2, F2 
 
-
-def LP_solver_without( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, mu ):
-    ## direction of angular momentum vector
-    H = cross( r_chs_0_ECI, r_trg_t_ECI )
-    h =  H / norm( H )
-
-    ## distance from focus
-    r1 = norm( r_chs_0_ECI )
-    r2 = norm( r_trg_t_ECI )
-
-    ## angle between two vectors
-    theta = arccos( dot( r_chs_0_ECI, r_trg_t_ECI ) / ( r1 * r2 ) )
-
-    ## solve Lambert Problem so calculate semimajor axis
-    LP = LambertProblem( )
-    a  = LP.solve( r1, r2, 0, t_tof, theta, mu )
-
-    F1, F2 = get_foci_by_a_without( a, h, r_chs_0_ECI, r_trg_t_ECI )
-
-    ## eccentricity
-    ae = norm( F1 )
-    e1 = ae / ( 2 * a )
-
-    ae = norm( F2 )
-    e2 = ae / ( 2 * a )
-
-    O_orp_F1 = {
-        'a': a,
-        'e': e1
-    }
-    O_orp_F2 = {
-        'a': a,
-        'e': e2
-    }
-
-    period = 2 * pi * sqrt( ( a**3 ) / mu )
-
-    R1 = get_ECI2PQW_from_foci( F1, h )
-    R2 = get_ECI2PQW_from_foci( F2, h )
-
-    if ( t_tof > ( period / 2 ) ):
-        Dv0_F1 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, R1, mu, reverse=True )
-        Dv1_F1 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F1, R1, mu, reverse=True )
-    else:
-        Dv0_F1 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, R1, mu )
-        Dv1_F1 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F1, R1, mu )
-
-    if ( t_tof > ( period / 2 ) ):
-        Dv0_F2 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F2, R2, mu, reverse=True )
-        Dv1_F2 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F2, R2, mu, reverse=True )
-    else:
-        Dv0_F2 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F2, R2, mu )
-        Dv1_F2 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F2, R2, mu )
-
-    Dv__F1 = norm( Dv0_F1 ) + norm( Dv1_F1 )
-    Dv__F2 = norm( Dv0_F2 ) + norm( Dv1_F2 )
-
-    if ( Dv__F1 < Dv__F2 ):
-
-        return O_orp_F1, Dv0_F1, -Dv1_F1, F1
-
-    else:
-
-        return O_orp_F2, Dv0_F2, -Dv1_F2, F2 
+    return _func

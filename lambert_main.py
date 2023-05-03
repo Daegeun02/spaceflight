@@ -1,7 +1,6 @@
 from trajectory import elliptic_orbit
 
-from lambert import LP_solver
-from lambert import LP_solver_without
+from lambert import Build_LP_solver
 
 from two_body_problem import estimate
 
@@ -25,9 +24,9 @@ from itertools import product
 
 
 
-t_tof = 12762.283
-t_chs = 1000
-t_trg = 5000
+t_tof = 17500
+t_chs = 0.0
+t_trg = 0.0
 
 O_chs = {
     "a": 10000,
@@ -48,24 +47,6 @@ O_trg = {
 }
 
 
-def draw_earth():       
-    # angles
-    polars = linspace(0, 180, 19)
-    azimuths = linspace(0, 360, 37)
-
-    # points
-    df = pd.DataFrame(product(polars, azimuths), columns=["azi", "polar"])
-    df["x"] = df.apply(lambda x: cos(deg2rad(x[1]))*sin(deg2rad(x[0])), axis=1)
-    df["y"] = df.apply(lambda x: sin(deg2rad(x[1]))*sin(deg2rad(x[0])), axis=1)
-    df["z"] = df.apply(lambda x: cos(deg2rad(x[0])), axis=1)
-
-    ax.plot_surface(df["x"].values.reshape((19, 37))*Re, 
-                    df["y"].values.reshape((19, 37))*Re, 
-                    df["z"].values.reshape((19, 37))*Re, 
-                    ec="w", lw=0.2, ls=":",
-                    cmap="viridis",
-                    alpha=0.3)
-    ax.set_box_aspect((1, 1, 1))
 
 
 if __name__ == "__main__":
@@ -74,11 +55,9 @@ if __name__ == "__main__":
     r_chs_0_ECI, v_chs_0_ECI = estimate( O_chs, MU, t_chs )
     ## estimate target's initial position and velocity
     r_trg_0_ECI, v_trg_0_ECI = estimate( O_trg, MU, t_trg )
-    ## estimate target's final position and velocity
-    r_trg_t_ECI, v_trg_t_ECI = UF_FG_S( r_trg_0_ECI, v_trg_0_ECI, O_trg, t_tof, MU )
 
-    # print( r_chs_0_ECI, v_chs_0_ECI )
-    # print( r_trg_0_ECI, v_trg_0_ECI )
+    print( r_chs_0_ECI, v_chs_0_ECI )
+    print( r_trg_0_ECI, v_trg_0_ECI )
 
     # _chs_0_ECI = array([5000e3, 0, 5042e3, 0, 7492.18085, 0])
     # _trg_0_ECI = array([2134089.51, 4094615.131, 5655178.001, -4451.749557, -3952.959997, 4930.183112])
@@ -94,13 +73,16 @@ if __name__ == "__main__":
     # v_trg_t_ECI = _trg_t_ECI[3:6] / 1000
 
     ## solve Lambert Problem
-    O_orp, Dv0, Dv1, F = LP_solver_without( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
+    _solver = Build_LP_solver( 
+        r_chs_0_ECI, v_chs_0_ECI, r_trg_0_ECI, v_trg_0_ECI, MU, O_chs, O_trg
+    )
 
-    O_orp, _Dv0, _Dv1, F = LP_solver( r_chs_0_ECI, v_chs_0_ECI, r_trg_t_ECI, v_trg_t_ECI, t_tof, MU )
+    O_orp, Dv0, Dv1, F = _solver( t_tof )
 
     print( O_orp )
     print( Dv0, Dv1 )
 
+    '''
     impulse = {
         0    : Dv0,
         t_tof: Dv1
@@ -233,4 +215,5 @@ if __name__ == "__main__":
 
     ax.legend()
 
-    # plt.show()
+    plt.show()
+    '''

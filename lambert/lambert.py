@@ -58,7 +58,7 @@ class LambertProblem:
         jacb = LP_jacb( args, J )
 
         ## solve with alpha, beta by levenberg-marquardt algorithm
-        xS = levenbergMarquardt( func, jacb, x0 )
+        xS = levenbergMarquardt( func, jacb, x0, force_return=True )
 
         a = s / ( 1 - cos( xS[0] ) )
 
