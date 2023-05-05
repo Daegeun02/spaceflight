@@ -8,10 +8,15 @@ from numpy import linspace
 from numpy import zeros
 from numpy import deg2rad
 from numpy import int64
+from numpy import save
 
 from numpy.linalg import norm
 
 import matplotlib.pyplot as plt
+
+import proplot as pplt
+
+from pandas import read_csv
 
 
 
@@ -33,8 +38,8 @@ O_trg = {
     "T": 0
 }
 
-t_chs = 0
-t_trg = 0
+t_chs = 000.0
+t_trg = 000.0
 
 ## estimate chaser's position and velocity
 r_chs_0_ECI, v_chs_0_ECI = estimate( O_chs, MU, t_chs )
@@ -69,21 +74,49 @@ def single():
 
 def multi():
 
-    tws = linspace(-5000,20000,251).astype(int64)
-    t1s = linspace(-5000,20000,251).astype(int64)
+    tws = linspace(-5000,20000,101)
+    t1s = linspace(-5000,20000,101)
 
-    Dv0s = zeros( (len(tws), len(t1s)) )
+    Dvs = zeros( (len(tws), len(t1s)) )
 
     for i in range( len( tws ) ):
         for j in range( len( t1s ) ):
-            tw = tws[i]
-            t1 = t1s[j]
+            t = [tws[i], t1s[j]]
 
-            O_orp, Dv0, Dv1, F = _solver( t1, tw )
-            Dv0s[i,j] = Dv0
-        
+            O_orp, Dv0, Dv1, F = _solver( t )
+            Dvs[i,j] = norm( Dv0 )
+    
+    save( './data/tws_3', tws )
+    save( './data/t1s_3', t1s )
+    save( './data/Dvs_3', Dvs )
 
 
 if __name__ == "__main__":
+    from numpy import load
 
-    multi()
+    # multi()
+
+    df = read_csv( './data/gradient_memory.csv' )
+    tws_trace = df['Unnamed: 1']
+    t1s_trace = df['Unnamed: 2']
+    Dvs_trace = df['Unnamed: 3']
+
+    tws = load( './data/tws_3.npy' )
+    t1s = load( './data/t1s_3.npy' )
+    Dvs = load( './data/Dvs_3.npy' )
+
+    lim = (-5000,20000)
+        
+    fig = pplt.figure( refwidth=2.3, share=False )
+    axs = fig.subplots(ncols=1, nrows=1)
+    axs.format(
+        xlabel='wait time', ylabel='time of flight',
+        xlim=lim, ylim=lim,
+        suptitle='velocity impulse via lambert problem'
+    )
+
+    axs[0].contourf( tws, t1s, Dvs, colorbar='b' )
+    axs[0].scatter( tws_trace, t1s_trace, color='g' )
+    axs[0].plot( tws_trace, t1s_trace, color='y' )
+
+    pplt.show()

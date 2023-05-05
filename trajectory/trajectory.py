@@ -18,6 +18,7 @@ def elliptic_orbit( OrbitalElement, r_xxx_x_ECI=None, v_xxx_x_ECI=None, dt=1, re
         o = OrbitalElement["o"]
         i = OrbitalElement["i"]
         w = OrbitalElement["w"]
+        R = ECI2PQW( o, i, w )
     except KeyError:
         R = OrbitalElement["R"]
     e = OrbitalElement["e"]
@@ -48,8 +49,6 @@ def elliptic_orbit( OrbitalElement, r_xxx_x_ECI=None, v_xxx_x_ECI=None, dt=1, re
 
     ## simulate
     t = 0
-    ## represent in ECI coordinate system
-    R = ECI2PQW( o, i, w )
 
     ## initialize state
     if ( ( type( r_xxx_x_ECI ) == ndarray ) and ( type( v_xxx_x_ECI ) == ndarray ) ):

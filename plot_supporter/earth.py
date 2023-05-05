@@ -4,7 +4,7 @@ from numpy import linspace
 from numpy import cos, sin
 from numpy import deg2rad
 
-from pandas import pd
+import pandas as pd
 
 from itertools import product
 

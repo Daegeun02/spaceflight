@@ -35,11 +35,12 @@ def Build_LP_solver( r_chs_x_ECI, v_chs_x_ECI, r_trg_x_ECI, v_trg_x_ECI, mu, O_c
     t2: time when arriving transfer
     theta: the angle between r1 and r2 vector
     '''
-    def _func( t_tof, tw=0.0 ):
+    def _func( t ):
+        tw, t_tof = t
         ## department
         r_chs_0_ECI, v_chs_0_ECI = UF_FG_S( r_chs_x_ECI, v_chs_x_ECI, O_chs, tw, mu )
         ## destination
-        r_trg_t_ECI, v_trg_t_ECI = UF_FG_S( r_trg_x_ECI, v_trg_x_ECI, O_trg, t_tof, mu )
+        r_trg_t_ECI, v_trg_t_ECI = UF_FG_S( r_trg_x_ECI, v_trg_x_ECI, O_trg, tw+t_tof, mu )
 
         ## direction of angular momentum vector
         H = cross( r_chs_0_ECI, r_trg_t_ECI )
@@ -65,6 +66,11 @@ def Build_LP_solver( r_chs_x_ECI, v_chs_x_ECI, r_trg_x_ECI, v_trg_x_ECI, mu, O_c
         ae = norm( F2 )
         e2 = ae / ( 2 * a )
 
+        period = 2 * pi * sqrt( ( a**3 ) / mu )
+
+        R1 = get_ECI2PQW_from_foci( F1, h )
+        R2 = get_ECI2PQW_from_foci( F2, h )
+
         O_orp_F1 = {
             'a': a,
             'e': e1,
@@ -75,11 +81,6 @@ def Build_LP_solver( r_chs_x_ECI, v_chs_x_ECI, r_trg_x_ECI, v_trg_x_ECI, mu, O_c
             'e': e2,
             'R': R2
         }
-
-        period = 2 * pi * sqrt( ( a**3 ) / mu )
-
-        R1 = get_ECI2PQW_from_foci( F1, h )
-        R2 = get_ECI2PQW_from_foci( F2, h )
 
         if ( t_tof > ( period / 2 ) ):
             Dv0_F1 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, R1, mu, reverse=True )
@@ -100,10 +101,10 @@ def Build_LP_solver( r_chs_x_ECI, v_chs_x_ECI, r_trg_x_ECI, v_trg_x_ECI, mu, O_c
 
         if ( Dv__F1 < Dv__F2 ):
 
-            return O_orp_F1, Dv0_F1, -Dv1_F1, F1
+            return ( O_orp_F1, Dv0_F1, -Dv1_F1, F1 )
 
         else:
 
-            return O_orp_F2, Dv0_F2, -Dv1_F2, F2 
+            return ( O_orp_F2, Dv0_F2, -Dv1_F2, F2 )
 
     return _func

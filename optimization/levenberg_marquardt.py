@@ -76,7 +76,7 @@ class LevenbergMarquardt:
                 lam *= 1.2
 
         if force_return:
-            print( f'force returned careful for numerical error => {norm( opt_cond )}' )
+            # print( f'force returned careful for numerical error => {norm( opt_cond )}' )
             return xK
 
         print( 'optimal condition =>', opt_cond )

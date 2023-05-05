@@ -1,10 +1,10 @@
-from JAX_universal import UF_func, UF_grad
-from JAX_universal import FG_expr
+from .JAX_universal import UF_func, UF_grad
+from .JAX_universal import FG_expr
 
-from JAX_lambert import *
+from .JAX_lambert import *
 
-from JAX_optimizer import newtonRaphson
-from JAX_optimizer import levenbergMarquardt
+from .JAX_optimizer import newtonRaphson
+from .JAX_optimizer import levenbergMarquardt
 
 from jax import jacobian
 

@@ -9,24 +9,29 @@ from transfer import UF_FG_S
 from geometry import MU
 from geometry import EARTHRADS as Re
 
+from plot_supporter import draw_earth
+
 import matplotlib.pyplot as plt
 
 from mpl_toolkits import mplot3d
 
-import pandas as pd
-
 from numpy import deg2rad
-from numpy import array
-from numpy import linspace
-from numpy import cos, sin
 
-from itertools import product
+from numpy.linalg import norm
 
 
+'''
+17507.416	318.0712
+'''
 
-t_tof = 17500
-t_chs = 0.0
-t_trg = 0.0
+# t_tof = 7913.2104
+# tw = 6862.5063
+
+t_tof = 318
+tw = 17507
+
+t = [ tw, t_tof ]
+
 
 O_chs = {
     "a": 10000,
@@ -52,12 +57,9 @@ O_trg = {
 if __name__ == "__main__":
 
     ## estimate chaser's position and velocity
-    r_chs_0_ECI, v_chs_0_ECI = estimate( O_chs, MU, t_chs )
+    r_chs_0_ECI, v_chs_0_ECI = estimate( O_chs, MU, 0.0 )
     ## estimate target's initial position and velocity
-    r_trg_0_ECI, v_trg_0_ECI = estimate( O_trg, MU, t_trg )
-
-    print( r_chs_0_ECI, v_chs_0_ECI )
-    print( r_trg_0_ECI, v_trg_0_ECI )
+    r_trg_0_ECI, v_trg_0_ECI = estimate( O_trg, MU, 0.0 )
 
     # _chs_0_ECI = array([5000e3, 0, 5042e3, 0, 7492.18085, 0])
     # _trg_0_ECI = array([2134089.51, 4094615.131, 5655178.001, -4451.749557, -3952.959997, 4930.183112])
@@ -77,14 +79,12 @@ if __name__ == "__main__":
         r_chs_0_ECI, v_chs_0_ECI, r_trg_0_ECI, v_trg_0_ECI, MU, O_chs, O_trg
     )
 
-    O_orp, Dv0, Dv1, F = _solver( t_tof )
+    O_orp, Dv0, Dv1, F = _solver( t )
 
-    print( O_orp )
-    print( Dv0, Dv1 )
+    print( norm( Dv0 ) )
 
-    '''
     impulse = {
-        0    : Dv0,
+        tw   : Dv0,
         t_tof: Dv1
     }
     ## simulate chaser's original orbit
@@ -101,13 +101,6 @@ if __name__ == "__main__":
     fig = plt.figure( figsize=( 8,8 ) )
     ax  = plt.axes( projection='3d' )
 
-    # ax.scatter(
-    #     0,
-    #     0,
-    #     0,
-    #     label=' earth ',
-    #     s=100
-    # )
     draw_earth()
 
     ax.scatter(
@@ -127,9 +120,9 @@ if __name__ == "__main__":
     )
 
     ax.plot3D(
-        pos_chs[0:t_chs,0],
-        pos_chs[0:t_chs,1],
-        pos_chs[0:t_chs,2],
+        pos_chs[0:tw,0],
+        pos_chs[0:tw,1],
+        pos_chs[0:tw,2],
         label=' chaser ',
         color='b'
     )
@@ -193,20 +186,20 @@ if __name__ == "__main__":
     )
 
     ax.plot3D(
-        pos_trg[t_trg:t_trg+t_tof,0],
-        pos_trg[t_trg:t_trg+t_tof,1],
-        pos_trg[t_trg:t_trg+t_tof,2],
+        pos_trg[tw:tw+t_tof,0],
+        pos_trg[tw:tw+t_tof,1],
+        pos_trg[tw:tw+t_tof,2],
         label=' target trajectory ',
         color='r'
     )
 
-    ax.scatter(
-        r_trg_t_ECI[0],
-        r_trg_t_ECI[1],
-        r_trg_t_ECI[2],
-        label=" rendezvous point ",
-        color='r'
-    )
+    # ax.scatter(
+    #     r_trg_t_ECI[0],
+    #     r_trg_t_ECI[1],
+    #     r_trg_t_ECI[2],
+    #     label=" rendezvous point ",
+    #     color='r'
+    # )
 
     ax.axis('equal')
     
@@ -216,4 +209,3 @@ if __name__ == "__main__":
     ax.legend()
 
     plt.show()
-    '''
