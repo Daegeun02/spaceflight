@@ -45,18 +45,6 @@ configs = {
     "a_trg": a_trg
 }
 
-'''
-[DeviceArray(1.6706686, dtype=float32), DeviceArray(11153.463, dtype=float32), DeviceArray(16373.818, dtype=float32), DeviceArray(17555.992, dtype=float32)]
-12765.339
-[DeviceArray(1.671028, dtype=float32), DeviceArray(10736.966, dtype=float32), DeviceArray(16395.225, dtype=float32), DeviceArray(17680.266, dtype=float32)]
-12713.157
-[DeviceArray(1.6691871, dtype=float32), DeviceArray(11102.987, dtype=float32), DeviceArray(16376.285, dtype=float32), DeviceArray(17571.46, dtype=float32)]
-12756.48
-[DeviceArray(1.6691054, dtype=float32), DeviceArray(10799.341, dtype=float32), DeviceArray(16391.867, dtype=float32), DeviceArray(17662.145, dtype=float32)]
-12703.914
-[DeviceArray(1.6711509, dtype=float32), DeviceArray(11167.447, dtype=float32), DeviceArray(16373.137, dtype=float32), DeviceArray(17551.684, dtype=float32)]
-12762.283
-'''
 
 if __name__ == "__main__":
     from numpy import array
