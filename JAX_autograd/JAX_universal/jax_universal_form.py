@@ -1,4 +1,4 @@
-from ..JAX_optimizer import newtonRaphson
+from JAX_optimizer import newtonRaphson
 
 from jax import jacobian
 from jax import jacfwd

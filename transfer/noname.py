@@ -1,6 +1,6 @@
 from .noname_sub_func import *
 
-from .universal_form import *
+from ..two_body_problem.universal_form import *
 
 from geometry import MU
 

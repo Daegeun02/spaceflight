@@ -4,9 +4,9 @@ from two_body_problem import estimate
 
 from optimization import newtonRaphson
 
-from ..transfer.universal_form import UF_func, UF_grad
+from ..two_body_problem.universal_form import UF_func, UF_grad
 
-from ..transfer.uf_state import UF_FG_S
+from ..two_body_problem.uf_state import UF_FG_S
 
 from geometry import MU
 

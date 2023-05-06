@@ -3,8 +3,7 @@ from trajectory import elliptic_orbit
 from lambert import Build_LP_solver
 
 from two_body_problem import estimate
-
-from transfer import UF_FG_S
+from two_body_problem import UF_FG_S
 
 from geometry import MU
 from geometry import EARTHRADS as Re

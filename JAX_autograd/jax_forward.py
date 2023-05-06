@@ -1,12 +1,12 @@
-from .JAX_universal import UF_func, UF_grad
-from .JAX_universal import FG_expr
+from JAX_universal import UF_func, UF_grad
+from JAX_universal import FG_expr
 
-from .JAX_lambert import *
+from JAX_lambert import *
 
-from .JAX_optimizer import newtonRaphson
-from .JAX_optimizer import levenbergMarquardt
+from JAX_optimizer import newtonRaphson
+from JAX_optimizer import levenbergMarquardt
 
-from jax import jacobian
+from jax import grad
 
 from jax.numpy import array
 from jax.numpy import dot, cross
@@ -233,7 +233,7 @@ if __name__ == "__main__":
 
     val = _func( t )
 
-    _grad = jacobian( _func )
+    _grad = grad( _func )
 
     print( 'val =>', val )
 

@@ -1,5 +1,5 @@
 ## lambert problem solver
-from transfer import UF_FG_S
+from two_body_problem import UF_FG_S
 
 from .lambert import LambertProblem
 
@@ -57,25 +57,36 @@ def Build_LP_solver( r_chs_x_ECI, v_chs_x_ECI, r_trg_x_ECI, v_trg_x_ECI, mu, O_c
         LP = LambertProblem( )
         a  = LP.solve( r1, r2, 0, t_tof, theta, mu )
 
+        period = 2 * pi * sqrt( ( a**3 ) / mu )
+
         F1, F2 = get_foci_by_a_without( a, h, r_chs_0_ECI, r_trg_t_ECI )
 
         ## eccentricity
         ae = norm( F1 )
         e1 = ae / ( 2 * a )
 
-        ae = norm( F2 )
-        e2 = ae / ( 2 * a )
-
-        period = 2 * pi * sqrt( ( a**3 ) / mu )
-
         R1 = get_ECI2PQW_from_foci( F1, h )
-        R2 = get_ECI2PQW_from_foci( F2, h )
 
         O_orp_F1 = {
             'a': a,
             'e': e1,
             'R': R1
         }
+
+        if ( t_tof > ( period / 2 ) ):
+            Dv0_F1 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, mu, reverse=True )
+            Dv1_F1 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F1, mu, reverse=True )
+        else:
+            Dv0_F1 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, mu )
+            Dv1_F1 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F1, mu )
+
+        return O_orp_F1, Dv0_F1, -Dv1_F1, F1
+
+        ae = norm( F2 )
+        e2 = ae / ( 2 * a )
+
+        R2 = get_ECI2PQW_from_foci( F2, h )
+
         O_orp_F2 = {
             'a': a,
             'e': e2,
@@ -83,18 +94,11 @@ def Build_LP_solver( r_chs_x_ECI, v_chs_x_ECI, r_trg_x_ECI, v_trg_x_ECI, mu, O_c
         }
 
         if ( t_tof > ( period / 2 ) ):
-            Dv0_F1 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, R1, mu, reverse=True )
-            Dv1_F1 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F1, R1, mu, reverse=True )
+            Dv0_F2 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F2, mu, reverse=True )
+            Dv1_F2 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F2, mu, reverse=True )
         else:
-            Dv0_F1 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F1, R1, mu )
-            Dv1_F1 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F1, R1, mu )
-
-        if ( t_tof > ( period / 2 ) ):
-            Dv0_F2 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F2, R2, mu, reverse=True )
-            Dv1_F2 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F2, R2, mu, reverse=True )
-        else:
-            Dv0_F2 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F2, R2, mu )
-            Dv1_F2 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F2, R2, mu )
+            Dv0_F2 = impulse_ctrl_without( r_chs_0_ECI, v_chs_0_ECI, O_orp_F2, mu )
+            Dv1_F2 = impulse_ctrl_without( r_trg_t_ECI, v_trg_t_ECI, O_orp_F2, mu )
 
         Dv__F1 = norm( Dv0_F1 ) + norm( Dv1_F1 )
         Dv__F2 = norm( Dv0_F2 ) + norm( Dv1_F2 )

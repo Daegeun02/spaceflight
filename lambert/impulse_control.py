@@ -43,10 +43,11 @@ def impulse_ctrl( r_xxx_x_ECI, v_xxx_x_ECI, O_orp, mu, reverse=False ):
         return -Dv_
 
     
-def impulse_ctrl_without( r_xxx_x_ECI, v_xxx_x_ECI, O_orp, R, mu, reverse=False ):
+def impulse_ctrl_without( r_xxx_x_ECI, v_xxx_x_ECI, O_orp, mu, reverse=False ):
     ## orbital element
     a = O_orp['a']
     e = O_orp['e']
+    R = O_orp['R']
 
     p = a * ( 1 - e**2 )
     C = sqrt( mu / p )

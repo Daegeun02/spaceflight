@@ -57,7 +57,8 @@ def single():
 
     Dv0s = []
     for t_tof in t_tofs:
-        O_orp, Dv0, Dv1, F = _solver( t_tof )
+        t = [0.0, t_tof]
+        O_orp, Dv0, Dv1, F = _solver( t )
         Dv0s.append( norm( Dv0 ) )
 
     plt.plot( t_tofs, Dv0s, label="impulse wave" )
@@ -65,6 +66,9 @@ def single():
     plt.title( 'velocity impulse for each time of flight via lambert solution')
     plt.xlabel( 'time of flight' )
     plt.ylabel( 'magnitude of Dv0 [Km/s]' )
+
+    plt.xlim([t_tofs[0],t_tofs[-1]])
+    plt.ylim([0,16])
 
     plt.legend()
     plt.grid()
@@ -90,12 +94,6 @@ def multi():
     save( './data/t1s_3', t1s )
     save( './data/Dvs_3', Dvs )
 
-
-if __name__ == "__main__":
-    from numpy import load
-
-    # multi()
-
     df = read_csv( './data/gradient_memory.csv' )
     tws_trace = df['Unnamed: 1']
     t1s_trace = df['Unnamed: 2']
@@ -120,3 +118,10 @@ if __name__ == "__main__":
     axs[0].plot( tws_trace, t1s_trace, color='y' )
 
     pplt.show()
+
+
+if __name__ == "__main__":
+    from numpy import load
+
+    single()
+    # multi()
